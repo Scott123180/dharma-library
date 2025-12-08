@@ -1,13 +1,20 @@
 function AboutPage() {
   return (
     <section className="about-page">
-      <p className="section__eyebrow">About</p>
-      <h1>What is Dharma Library?</h1>
-      <p className="section__subtitle">
-        A calm place to read and listen to Dharma talks. We ingest recordings, generate and
-        clean transcripts, and publish them so practitioners can stay close to the teacher&apos;s
-        original voice.
-      </p>
+      <div className="about-hero">
+        <div>
+          <p className="section__eyebrow">About</p>
+          <h1>What is Dharma Library?</h1>
+          <p className="section__subtitle">
+            A calm place to read and listen to Dharma talks. We ingest recordings, generate and
+            clean transcripts, and publish them so practitioners can stay close to the teacher&apos;s
+            original voice.
+          </p>
+        </div>
+        <div className="about-illustration" aria-hidden="true">
+          <img src="/buddha.svg" alt="" />
+        </div>
+      </div>
 
       <div className="about-grid">
         <article className="about-card">
