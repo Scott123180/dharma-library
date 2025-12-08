@@ -355,6 +355,108 @@ a {
   color: var(--muted);
 }
 
+.talk-detail {
+  background: linear-gradient(180deg, var(--surface) 0%, var(--surface-alt) 100%);
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  padding: 22px;
+  box-shadow: var(--shadow);
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.talk-detail__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+
+.talk-detail__meta {
+  margin: 6px 0 8px;
+  color: var(--muted);
+}
+
+.talk-detail__caption {
+  margin: 0;
+  color: var(--muted);
+  font-style: italic;
+}
+
+.talk-detail__pills {
+  display: flex;
+  gap: 8px;
+}
+
+.talk-detail__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 12px;
+}
+
+.talk-detail__card {
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 14px;
+}
+
+.talk-detail__card h3 {
+  margin: 0 0 10px;
+}
+
+.meta-grid {
+  display: grid;
+  grid-template-columns: 150px 1fr;
+  row-gap: 6px;
+  column-gap: 10px;
+  margin: 0;
+}
+
+.meta-grid dt {
+  color: var(--muted);
+}
+
+.meta-grid dd {
+  margin: 0;
+  font-weight: 600;
+}
+
+.audio-player {
+  width: 100%;
+  margin: 8px 0;
+}
+
+.talk-detail__note {
+  color: var(--muted);
+  margin: 0;
+  font-size: 0.95rem;
+}
+
+.transcript {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.transcript__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.transcript__body {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  color: var(--muted);
+  line-height: 1.6;
+}
+
 @media (max-width: 720px) {
   .header {
     flex-direction: column;
@@ -369,5 +471,9 @@ a {
 
   .section__header {
     flex-direction: column;
+  }
+
+  .meta-grid {
+    grid-template-columns: 1fr;
   }
 }

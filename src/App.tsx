@@ -2,6 +2,7 @@ import Header from "./components/Header";
 import Footer from "./components/Footer";
 import FeatureCard from "./components/FeatureCard";
 import TalkCard, { Talk } from "./components/TalkCard";
+import TalkDetail, { FullTalk } from "./components/TalkDetail";
 
 const talks: Talk[] = [
   {
@@ -51,6 +52,28 @@ const features = [
   }
 ];
 
+const featuredTalk: FullTalk = {
+  title: "Neither The Wind Nor The Flag",
+  teacher: "John Daido Loori",
+  duration: "1:28:44 (approx)",
+  location: "Zen Mountain Monastery",
+  date: "1981-11-20 14:30",
+  audioUrl: "https://media-archive.zmmapple.com/pages/download.php?direct=1&ref=30594&ext=mp3",
+  collection: "Gateless Gate",
+  track: "29",
+  koanCase: "29",
+  catalogId: "66",
+  trainingQuarter: "1981 Fall",
+  contributedBy: "Archivist",
+  resourceId: "30594",
+  caption: "Koan: Not the wind, not the flag—mind is moving.",
+  transcript: [
+    "A monk once pointed to a flag rippling in the wind and asked, “Is it the wind that moves, or the flag that moves?” The teacher replied, “Neither the wind nor the flag. It is mind that moves.”",
+    "In this talk Daido Roshi unpacks how we chase movement in our experience. When we sit, we see the mind hurry to label every sensation—wind, flag, self—missing the direct taste of change itself.",
+    "Practice invites us to meet each flicker of sensation as it is, without trying to nail it down. Zazen isn’t about stopping the wind or stilling the flag; it’s learning to rest in the awareness that holds them both."
+  ]
+};
+
 function App() {
   return (
     <div className="page">
@@ -74,6 +97,10 @@ function App() {
               See what&apos;s coming
             </a>
           </div>
+        </section>
+
+        <section id="feature-talk" className="section">
+          <TalkDetail talk={featuredTalk} />
         </section>
 
         <section id="talks" className="section">
