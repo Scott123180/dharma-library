@@ -94,9 +94,6 @@ function TalkDetail({ talk }: TalkDetailProps) {
               <audio controls className="audio-player" src={talk.audioUrl}>
                 Your browser does not support the audio element.
               </audio>
-              <p className="talk-detail__note">
-                Replace the sample URL with your hosted audio when it&apos;s ready.
-              </p>
             </>
           ) : (
             <p className="talk-detail__note">Add an audio URL to enable playback.</p>

@@ -8,9 +8,16 @@ export type Talk = {
 
 type TalkCardProps = {
   talk: Talk;
+  onOpen?: () => void;
 };
 
-function TalkCard({ talk }: TalkCardProps) {
+function TalkCard({ talk, onOpen }: TalkCardProps) {
+  const handleOpen = (event: React.MouseEvent<HTMLAnchorElement, MouseEvent>) => {
+    if (!onOpen) return;
+    event.preventDefault();
+    onOpen();
+  };
+
   return (
     <article className="talk-card">
       <div className="talk-card__meta">
@@ -26,7 +33,7 @@ function TalkCard({ talk }: TalkCardProps) {
           </span>
         ))}
       </div>
-      <a className="link" href="#">
+      <a className="link" href="#" onClick={handleOpen}>
         Open transcript (sample)
       </a>
     </article>

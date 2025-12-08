@@ -1,8 +1,12 @@
+import { useEffect, useState } from "react";
 import Header from "./components/Header";
 import Footer from "./components/Footer";
 import FeatureCard from "./components/FeatureCard";
 import TalkCard, { Talk } from "./components/TalkCard";
 import TalkDetail, { FullTalk } from "./components/TalkDetail";
+import RoadmapPage from "./pages/RoadmapPage";
+import TalkPage from "./pages/TalkPage";
+import AboutPage from "./pages/AboutPage";
 
 const talks: Talk[] = [
   {
@@ -35,7 +39,7 @@ const features = [
   {
     title: "Clean transcripts",
     description:
-      "Talks are transcribed by machine and refined by an editor so you can read fluid, trustworthy teachings.",
+      "Talks are transcribed by machine and cleaned by an llm so you can read fluid, trustworthy teachings.",
     status: "Live now"
   },
   {
@@ -74,96 +78,155 @@ const featuredTalk: FullTalk = {
   ]
 };
 
+const getInitialTheme = (): "light" | "dark" => {
+  if (typeof window === "undefined") {
+    return "dark";
+  }
+  const stored = window.localStorage.getItem("theme");
+  if (stored === "light" || stored === "dark") {
+    return stored;
+  }
+  const prefersLight = window.matchMedia("(prefers-color-scheme: light)").matches;
+  return prefersLight ? "light" : "dark";
+};
+
+const getInitialRoute = (): "home" | "roadmap" | "talk" | "about" => {
+  if (typeof window === "undefined") {
+    return "home";
+  }
+  if (window.location.pathname === "/roadmap") return "roadmap";
+  if (window.location.pathname === "/talk") return "talk";
+  if (window.location.pathname === "/about") return "about";
+  return "home";
+};
+
 function App() {
+  const [theme, setTheme] = useState<"light" | "dark">(() => getInitialTheme());
+  const [route, setRoute] = useState<"home" | "roadmap" | "talk" | "about">(
+    () => getInitialRoute()
+  );
+
+  useEffect(() => {
+    document.documentElement.setAttribute("data-theme", theme);
+    window.localStorage.setItem("theme", theme);
+  }, [theme]);
+
+  useEffect(() => {
+    const handlePop = () => setRoute(getInitialRoute());
+    window.addEventListener("popstate", handlePop);
+    return () => window.removeEventListener("popstate", handlePop);
+  }, []);
+
+  useEffect(() => {
+    const path =
+      route === "roadmap" ? "/roadmap" : route === "talk" ? "/talk" : route === "about" ? "/about" : "/";
+    if (window.location.pathname !== path) {
+      window.history.pushState({}, "", path);
+    }
+  }, [route]);
+
+  const toggleTheme = () => setTheme((prev) => (prev === "dark" ? "light" : "dark"));
+  const navigate = (next: "home" | "roadmap" | "talk" | "about") => setRoute(next);
+
   return (
     <div className="page">
-      <Header />
+      <Header theme={theme} onToggleTheme={toggleTheme} route={route} onNavigate={navigate} />
       <main className="content">
-        <section className="hero">
-          <div className="hero__eyebrow">dharmalibrary.link</div>
-          <h1 className="hero__title">
-            A calm library for Dharma talks—read now, listen soon.
-          </h1>
-          <p className="hero__lead">
-            Dharma Library hosts a growing catalogue of teachings. Every talk is
-            transcribed, cleaned, and ready to read. Audio pairings and a smart
-            search experience are on the way.
-          </p>
-          <div className="hero__actions">
-            <a className="btn btn-primary" href="#talks">
-              Start reading
-            </a>
-            <a className="btn btn-ghost" href="#roadmap">
-              See what&apos;s coming
-            </a>
-          </div>
-        </section>
-
-        <section id="feature-talk" className="section">
-          <TalkDetail talk={featuredTalk} />
-        </section>
-
-        <section id="talks" className="section">
-          <div className="section__header">
-            <div>
-              <p className="section__eyebrow">Featured reads</p>
-              <h2>Talks ready for you today</h2>
-              <p className="section__subtitle">
-                Browse a few hand-picked samples while we finish ingesting the
-                full archive. Each page is formatted for calm, focused reading.
+        {route === "home" ? (
+          <>
+            <section className="hero">
+              <div className="hero__eyebrow">dharmalibrary.link</div>
+              <h1 className="hero__title">
+                A calm library for Dharma talks—read now, listen soon.
+              </h1>
+              <p className="hero__lead">
+                Dharma Library hosts a growing catalogue of teachings. Every talk is
+                transcribed, cleaned, and ready to read. Audio pairings and a smart
+                search experience are on the way.
               </p>
-            </div>
-            <a className="link" href="#">
-              View full library (soon)
-            </a>
-          </div>
-          <div className="cards-grid">
-            {talks.map((talk) => (
-              <TalkCard key={talk.title} talk={talk} />
-            ))}
-          </div>
-        </section>
+              <div className="hero__actions">
+                <button className="btn btn-primary" onClick={() => navigate("talk")}>
+                  Start reading
+                </button>
+                <button className="btn btn-ghost" onClick={() => navigate("roadmap")}>
+                  See what&apos;s coming
+                </button>
+              </div>
+            </section>
 
-        <section id="roadmap" className="section muted">
-          <div className="section__header">
-            <div>
-              <p className="section__eyebrow">Built for practice</p>
-              <h2>Thoughtful features on the way</h2>
-              <p className="section__subtitle">
-                We are focusing on simplicity first: readable transcripts,
-                structured metadata, and audio that keeps you close to the
-                teacher&apos;s original voice.
-              </p>
-            </div>
-          </div>
-          <div className="cards-grid features">
-            {features.map((feature) => (
-              <FeatureCard key={feature.title} {...feature} />
-            ))}
-          </div>
-        </section>
+            <section id="feature-talk" className="section">
+              <TalkDetail talk={featuredTalk} />
+            </section>
 
-        <section className="section cta">
-          <div>
-            <p className="section__eyebrow">For teachers & sanghas</p>
-            <h2>Want your talks included?</h2>
-            <p className="section__subtitle">
-              We can ingest recordings, run careful transcripts, and keep your
-              teachings discoverable. Drop a note and we&apos;ll reach out as
-              the library opens.
-            </p>
-          </div>
-          <div className="cta__actions">
-            <a className="btn btn-primary" href="mailto:hello@dharmalibrary.link">
-              Email the team
-            </a>
-            <a className="btn btn-ghost" href="#">
-              Roadmap updates
-            </a>
-          </div>
-        </section>
+            <section id="talks" className="section">
+              <div className="section__header">
+                <div>
+                  <p className="section__eyebrow">Featured reads</p>
+                  <h2>Talks ready for you today</h2>
+                  <p className="section__subtitle">
+                    Browse a few hand-picked samples while we finish ingesting the
+                    full archive. Each page is formatted for calm, focused reading.
+                  </p>
+                </div>
+                <button className="btn btn-ghost" onClick={() => navigate("talk")}>
+                  View full library (soon)
+                </button>
+              </div>
+              <div className="cards-grid">
+                {talks.map((talk) => (
+                  <TalkCard key={talk.title} talk={talk} onOpen={() => navigate("talk")} />
+                ))}
+              </div>
+            </section>
+
+            <section className="section muted">
+              <div className="section__header">
+                <div>
+                  <p className="section__eyebrow">Built for practice</p>
+                  <h2>Thoughtful features on the way</h2>
+                  <p className="section__subtitle">
+                    We are focusing on simplicity first: readable transcripts,
+                    structured metadata, and audio that keeps you close to the
+                    teacher&apos;s original voice.
+                  </p>
+                </div>
+              </div>
+              <div className="cards-grid features">
+                {features.map((feature) => (
+                  <FeatureCard key={feature.title} {...feature} />
+                ))}
+              </div>
+            </section>
+
+            <section className="section cta">
+              <div>
+                <p className="section__eyebrow">For teachers & sanghas</p>
+                <h2>Want your talks included?</h2>
+                <p className="section__subtitle">
+                  We can ingest recordings, run careful transcripts, and keep your
+                  teachings discoverable. Drop a note and we&apos;ll reach out as
+                  the library opens.
+                </p>
+              </div>
+              <div className="cta__actions">
+                <a className="btn btn-primary" href="mailto:hello@dharmalibrary.link">
+                  Send me an email
+                </a>
+                <button className="btn btn-ghost" onClick={() => navigate("roadmap")}>
+                  Roadmap updates
+                </button>
+              </div>
+            </section>
+          </>
+        ) : route === "roadmap" ? (
+          <RoadmapPage onNavigate={navigate} />
+        ) : route === "talk" ? (
+          <TalkPage talk={featuredTalk} onNavigate={navigate} />
+        ) : (
+          <AboutPage />
+        )}
       </main>
-      <Footer />
+      <Footer onNavigate={navigate} />
     </div>
   );
 }
