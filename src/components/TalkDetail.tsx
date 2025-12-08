@@ -1,3 +1,5 @@
+import { useEffect, useRef } from "react";
+
 export type FullTalk = {
   title: string;
   teacher: string;
@@ -18,9 +20,29 @@ export type FullTalk = {
 
 type TalkDetailProps = {
   talk: FullTalk;
+  onPlay?: (talk: FullTalk) => void;
+  onInlinePlay?: (talk: FullTalk) => void;
+  onInlineProgress?: (seconds: number) => void;
+  inlineActive?: boolean;
+  inlinePosition?: number;
 };
 
-function TalkDetail({ talk }: TalkDetailProps) {
+function TalkDetail({
+  talk,
+  onPlay,
+  onInlinePlay,
+  onInlineProgress,
+  inlineActive,
+  inlinePosition = 0
+}: TalkDetailProps) {
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+
+  useEffect(() => {
+    if (!inlineActive && audioRef.current) {
+      audioRef.current.pause();
+    }
+  }, [inlineActive]);
+
   return (
     <article className="talk-detail">
       <div className="talk-detail__header">
@@ -90,11 +112,36 @@ function TalkDetail({ talk }: TalkDetailProps) {
         <div className="talk-detail__card">
           <h3>Audio</h3>
           {talk.audioUrl ? (
-            <>
-              <audio controls className="audio-player" src={talk.audioUrl}>
+            <div className="audio-player__container">
+              <audio
+                ref={audioRef}
+                controls
+                className="audio-player"
+                src={talk.audioUrl}
+                onPlay={() => onInlinePlay?.(talk)}
+                onLoadedMetadata={() => {
+                  if (inlinePosition > 0 && audioRef.current) {
+                    audioRef.current.currentTime = inlinePosition;
+                  }
+                }}
+                onTimeUpdate={() => {
+                  if (audioRef.current) {
+                    onInlineProgress?.(audioRef.current.currentTime);
+                  }
+                }}
+              >
                 Your browser does not support the audio element.
               </audio>
-            </>
+              <div className="audio-player__actions">
+                <button className="btn btn-primary" onClick={() => onPlay?.(talk)}>
+                  Pop out mini player
+                </button>
+                <p className="talk-detail__note">
+                  Play inline or pop out. If you leave this page while playing inline, we&apos;ll
+                  move it to the mini player so it keeps going.
+                </p>
+              </div>
+            </div>
           ) : (
             <p className="talk-detail__note">Add an audio URL to enable playback.</p>
           )}

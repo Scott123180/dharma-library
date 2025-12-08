@@ -2,10 +2,13 @@ import TalkDetail, { FullTalk } from "../components/TalkDetail";
 
 type TalkPageProps = {
   talk: FullTalk;
-  onNavigate?: (route: "home" | "roadmap" | "talk") => void;
+  onNavigate?: (route: "home" | "roadmap" | "talk" | "about") => void;
+  onPlay?: (talk: FullTalk) => void;
+  onInlinePlay?: (talk: FullTalk) => void;
+  onInlineProgress?: (seconds: number) => void;
 };
 
-function TalkPage({ talk, onNavigate }: TalkPageProps) {
+function TalkPage({ talk, onNavigate, onPlay, onInlinePlay, onInlineProgress }: TalkPageProps) {
   return (
     <section className="talk-page">
       <div className="section__header">
@@ -23,7 +26,13 @@ function TalkPage({ talk, onNavigate }: TalkPageProps) {
         </div>
       </div>
 
-      <TalkDetail talk={talk} />
+      <TalkDetail
+        talk={talk}
+        onPlay={onPlay}
+        onInlinePlay={onInlinePlay}
+        onInlineProgress={onInlineProgress}
+        inlineActive
+      />
     </section>
   );
 }

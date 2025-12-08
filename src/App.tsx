@@ -7,6 +7,7 @@ import TalkDetail, { FullTalk } from "./components/TalkDetail";
 import RoadmapPage from "./pages/RoadmapPage";
 import TalkPage from "./pages/TalkPage";
 import AboutPage from "./pages/AboutPage";
+import PlayerBar from "./components/PlayerBar";
 
 const talks: Talk[] = [
   {
@@ -90,7 +91,9 @@ const getInitialTheme = (): "light" | "dark" => {
   return prefersLight ? "light" : "dark";
 };
 
-const getInitialRoute = (): "home" | "roadmap" | "talk" | "about" => {
+type Route = "home" | "roadmap" | "talk" | "about";
+
+const getInitialRoute = (): Route => {
   if (typeof window === "undefined") {
     return "home";
   }
@@ -102,9 +105,9 @@ const getInitialRoute = (): "home" | "roadmap" | "talk" | "about" => {
 
 function App() {
   const [theme, setTheme] = useState<"light" | "dark">(() => getInitialTheme());
-  const [route, setRoute] = useState<"home" | "roadmap" | "talk" | "about">(
-    () => getInitialRoute()
-  );
+  const [route, setRoute] = useState<Route>(() => getInitialRoute());
+  const [nowPlaying, setNowPlaying] = useState<{ talk: FullTalk; position: number } | null>(null);
+  const [inlinePlaying, setInlinePlaying] = useState<{ talk: FullTalk; route: Route; position: number } | null>(null);
 
   useEffect(() => {
     document.documentElement.setAttribute("data-theme", theme);
@@ -125,8 +128,39 @@ function App() {
     }
   }, [route]);
 
+  useEffect(() => {
+    if (
+      inlinePlaying &&
+      inlinePlaying.route !== route &&
+      !nowPlaying
+    ) {
+      setNowPlaying({ talk: inlinePlaying.talk, position: inlinePlaying.position });
+      setInlinePlaying(null);
+    }
+  }, [route, inlinePlaying, nowPlaying]);
+
   const toggleTheme = () => setTheme((prev) => (prev === "dark" ? "light" : "dark"));
-  const navigate = (next: "home" | "roadmap" | "talk" | "about") => setRoute(next);
+  const navigate = (next: Route) => setRoute(next);
+  const handlePlay = (talk: FullTalk) => {
+    const startAt =
+      inlinePlaying && inlinePlaying.talk.title === talk.title ? inlinePlaying.position : 0;
+    setNowPlaying({ talk, position: startAt });
+    setInlinePlaying(null);
+  };
+  const handleInlinePlay = (talk: FullTalk) => {
+    setInlinePlaying({ talk, route, position: 0 });
+  };
+  const handleInlineProgress = (seconds: number) => {
+    if (inlinePlaying) {
+      setInlinePlaying({ ...inlinePlaying, position: seconds });
+    }
+  };
+
+  const handleGlobalProgress = (seconds: number) => {
+    if (nowPlaying) {
+      setNowPlaying({ ...nowPlaying, position: seconds });
+    }
+  };
 
   return (
     <div className="page">
@@ -155,7 +189,18 @@ function App() {
             </section>
 
             <section id="feature-talk" className="section">
-              <TalkDetail talk={featuredTalk} />
+              <TalkDetail
+                talk={featuredTalk}
+                onPlay={handlePlay}
+                onInlinePlay={handleInlinePlay}
+                onInlineProgress={handleInlineProgress}
+                inlineActive={
+                  inlinePlaying?.talk.title === featuredTalk.title && inlinePlaying.route === route
+                }
+                inlinePosition={
+                  inlinePlaying?.talk.title === featuredTalk.title ? inlinePlaying.position : 0
+                }
+              />
             </section>
 
             <section id="talks" className="section">
@@ -174,7 +219,14 @@ function App() {
               </div>
               <div className="cards-grid">
                 {talks.map((talk) => (
-                  <TalkCard key={talk.title} talk={talk} onOpen={() => navigate("talk")} />
+                  <TalkCard
+                    key={talk.title}
+                    talk={talk}
+                    onOpen={() => {
+                      setNowPlaying(null);
+                      navigate("talk");
+                    }}
+                  />
                 ))}
               </div>
             </section>
@@ -221,12 +273,24 @@ function App() {
         ) : route === "roadmap" ? (
           <RoadmapPage onNavigate={navigate} />
         ) : route === "talk" ? (
-          <TalkPage talk={featuredTalk} onNavigate={navigate} />
+          <TalkPage
+            talk={featuredTalk}
+            onNavigate={navigate}
+            onPlay={handlePlay}
+            onInlinePlay={handleInlinePlay}
+            onInlineProgress={handleInlineProgress}
+          />
         ) : (
           <AboutPage />
         )}
       </main>
       <Footer onNavigate={navigate} />
+      <PlayerBar
+        talk={nowPlaying?.talk ?? null}
+        startAt={nowPlaying?.position ?? 0}
+        onClose={() => setNowPlaying(null)}
+        onProgress={handleGlobalProgress}
+      />
     </div>
   );
 }

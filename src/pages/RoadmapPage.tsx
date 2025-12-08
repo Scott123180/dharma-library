@@ -2,7 +2,7 @@ const phases = [
   {
     title: "All talks ingested",
     status: "Done",
-    description: "6,300 talks are transcribed and in the library database.",
+    description: "6,300 talks from Zen Mountain Monestary are transcribed and in the library database.",
     detail: "Source audio has been ingested and aligned with transcript text.",
     badge: "Complete"
   },
