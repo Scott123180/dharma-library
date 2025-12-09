@@ -72,6 +72,8 @@ const featuredTalk: FullTalk = {
   contributedBy: "Archivist",
   resourceId: "30594",
   caption: "Koan: Not the wind, not the flag—mind is moving.",
+  summary:
+    "Daido Roshi uses the koan of the wind and flag to point back to the mind that names, chases, and resists what it senses. Instead of trying to still experience, the talk invites resting in awareness itself—seeing movement without being moved by it.",
   transcript: [
     "A monk once pointed to a flag rippling in the wind and asked, “Is it the wind that moves, or the flag that moves?” The teacher replied, “Neither the wind nor the flag. It is mind that moves.”",
     "In this talk Daido Roshi unpacks how we chase movement in our experience. When we sit, we see the mind hurry to label every sensation—wind, flag, self—missing the direct taste of change itself.",
@@ -194,6 +196,7 @@ function App() {
                 onPlay={handlePlay}
                 onInlinePlay={handleInlinePlay}
                 onInlineProgress={handleInlineProgress}
+                onViewTalk={() => navigate("talk")}
                 inlineActive={
                   inlinePlaying?.talk.title === featuredTalk.title && inlinePlaying.route === route
                 }

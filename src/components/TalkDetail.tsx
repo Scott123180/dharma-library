@@ -7,6 +7,7 @@ export type FullTalk = {
   location: string;
   date: string;
   audioUrl?: string;
+  summary?: string;
   collection?: string;
   track?: string;
   koanCase?: string;
@@ -25,6 +26,7 @@ type TalkDetailProps = {
   onInlineProgress?: (seconds: number) => void;
   inlineActive?: boolean;
   inlinePosition?: number;
+  onViewTalk?: (talk: FullTalk) => void;
 };
 
 function TalkDetail({
@@ -33,7 +35,8 @@ function TalkDetail({
   onInlinePlay,
   onInlineProgress,
   inlineActive,
-  inlinePosition = 0
+  inlinePosition = 0,
+  onViewTalk
 }: TalkDetailProps) {
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
@@ -61,6 +64,24 @@ function TalkDetail({
       </div>
 
       <div className="talk-detail__grid">
+        {talk.summary ? (
+          <div className="talk-detail__card talk-detail__summary">
+            <div className="transcript__header">
+              <div>
+                <p className="section__eyebrow">Transcript summary</p>
+                <h3>In brief</h3>
+              </div>
+              <span className="pill pill--subtle">Overview</span>
+            </div>
+            <p className="talk-detail__summary-text">{talk.summary}</p>
+            {onViewTalk ? (
+              <button className="btn btn-ghost" onClick={() => onViewTalk(talk)}>
+                Read the full talk
+              </button>
+            ) : null}
+          </div>
+        ) : null}
+
         <div className="talk-detail__card">
           <h3>Details</h3>
           <dl className="meta-grid">

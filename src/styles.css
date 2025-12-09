@@ -769,6 +769,19 @@ a {
   margin: 0 0 10px;
 }
 
+.talk-detail__summary {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.03), rgba(255, 255, 255, 0.01));
+}
+
+.talk-detail__summary-text {
+  margin: 0;
+  color: var(--muted);
+  line-height: 1.6;
+}
+
 .meta-grid {
   display: grid;
   grid-template-columns: 150px 1fr;
