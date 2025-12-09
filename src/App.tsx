@@ -4,6 +4,7 @@ import Footer from "./components/Footer";
 import FeatureCard from "./components/FeatureCard";
 import TalkCard, { Talk } from "./components/TalkCard";
 import TalkDetail, { FullTalk } from "./components/TalkDetail";
+import FeaturedTalk from "./components/FeaturedTalk";
 import RoadmapPage from "./pages/RoadmapPage";
 import TalkPage from "./pages/TalkPage";
 import AboutPage from "./pages/AboutPage";
@@ -191,12 +192,11 @@ function App() {
             </section>
 
             <section id="feature-talk" className="section">
-              <TalkDetail
+              <FeaturedTalk
                 talk={featuredTalk}
                 onPlay={handlePlay}
                 onInlinePlay={handleInlinePlay}
                 onInlineProgress={handleInlineProgress}
-                onViewTalk={() => navigate("talk")}
                 inlineActive={
                   inlinePlaying?.talk.title === featuredTalk.title && inlinePlaying.route === route
                 }

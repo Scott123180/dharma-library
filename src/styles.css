@@ -728,6 +728,71 @@ a {
   gap: 18px;
 }
 
+.featured-talk {
+  background: linear-gradient(180deg, var(--surface) 0%, var(--surface-alt) 100%);
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  padding: 22px;
+  box-shadow: var(--shadow);
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.featured-talk__header {
+  display: flex;
+  justify-content: space-between;
+  gap: 14px;
+  align-items: flex-start;
+  flex-wrap: wrap;
+}
+
+.featured-talk__meta {
+  margin: 6px 0 8px;
+  color: var(--muted);
+}
+
+.featured-talk__caption {
+  margin: 0;
+  color: var(--muted);
+  font-style: italic;
+}
+
+.featured-talk__summary {
+  margin: 8px 0 0;
+  color: var(--text);
+  line-height: 1.6;
+}
+
+.featured-talk__actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.featured-talk__card {
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.featured-talk__card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.featured-talk__card-actions {
+  display: flex;
+  justify-content: flex-end;
+}
+
 .talk-detail__header {
   display: flex;
   justify-content: space-between;
@@ -780,6 +845,11 @@ a {
   margin: 0;
   color: var(--muted);
   line-height: 1.6;
+}
+
+.talk-detail__actions {
+  display: flex;
+  justify-content: flex-end;
 }
 
 .meta-grid {
