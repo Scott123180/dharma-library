@@ -9,6 +9,20 @@
       name="description"
       content="Read and listen to curated Dharma talks. dharmalibrary.link hosts a growing library of transcribed and cleaned teachings."
     />
+    <script>
+      (() => {
+        try {
+          const stored = localStorage.getItem("theme");
+          const prefersLight = window.matchMedia("(prefers-color-scheme: light)").matches;
+          const theme =
+            stored === "light" || stored === "dark" ? stored : prefersLight ? "light" : "dark";
+          document.documentElement.setAttribute("data-theme", theme);
+          document.documentElement.style.colorScheme = theme;
+        } catch (err) {
+          // Ignore and let CSS default to dark if anything goes wrong.
+        }
+      })();
+    </script>
   </head>
   <body>
     <div id="root"></div>
