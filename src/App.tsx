@@ -333,36 +333,22 @@ function App() {
           <RoadmapPage onNavigate={navigate} />
         ) : route === "talk" ? (
           <section className="talk-page">
-            <div className="section__header">
-              <div>
-                <p className="section__eyebrow">Transcript library</p>
-                <h1>Browse Dharma talks</h1>
-                <p className="section__subtitle">Loaded from {indexLoading ? "…" : "the index"}.</p>
-              </div>
-              <div className="cta__actions">
-                <button className="btn btn-ghost" onClick={() => navigate("home")}>
-                  Back to home
-                </button>
-              </div>
-            </div>
-            <div className="talk-page__detail">
-              {selectedTalkId ? (
-                <TalkDetail
-                  talkId={selectedTalkId}
-                  onPlay={handlePlay}
-                  onInlinePlay={handleInlinePlay}
-                  onInlineProgress={handleInlineProgress}
-                  inlineActive={activeInlineTalkId === selectedTalkId}
-                  inlinePosition={activeInlineTalkId === selectedTalkId ? inlinePlaying?.position ?? 0 : 0}
-                  onBack={() => {
-                    setSelectedTalkId(null);
-                    navigate("home");
-                  }}
-                />
-              ) : (
-                <p>Select a talk on the home page to read.</p>
-              )}
-            </div>
+            {selectedTalkId ? (
+              <TalkDetail
+                talkId={selectedTalkId}
+                onPlay={handlePlay}
+                onInlinePlay={handleInlinePlay}
+                onInlineProgress={handleInlineProgress}
+                inlineActive={activeInlineTalkId === selectedTalkId}
+                inlinePosition={activeInlineTalkId === selectedTalkId ? inlinePlaying?.position ?? 0 : 0}
+                onBack={() => {
+                  setSelectedTalkId(null);
+                  navigate("home");
+                }}
+              />
+            ) : (
+              <p>Select a talk on the home page to read.</p>
+            )}
           </section>
         ) : (
           <AboutPage />
