@@ -867,6 +867,13 @@ a {
 .meta-grid dd {
   margin: 0;
   font-weight: 600;
+  word-break: break-word;
+}
+
+.talk-detail__tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
 }
 
 .audio-player {
@@ -897,9 +904,13 @@ a {
 .transcript__body {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 6px;
   color: var(--muted);
   line-height: 1.6;
+}
+
+.transcript__body p {
+  margin: 0; /* rely on gap to control spacing */
 }
 
 @media (max-width: 720px) {

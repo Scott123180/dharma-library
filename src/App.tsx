@@ -46,19 +46,26 @@ const getInitialTheme = (): "light" | "dark" => {
 
 type Route = "home" | "roadmap" | "talk" | "about";
 
-const getInitialRoute = (): Route => {
+const parseLocation = (): { route: Route; talkId: string | null } => {
   if (typeof window === "undefined") {
-    return "home";
+    return { route: "home", talkId: null };
   }
-  if (window.location.pathname === "/roadmap") return "roadmap";
-  if (window.location.pathname === "/talk") return "talk";
-  if (window.location.pathname === "/about") return "about";
-  return "home";
+
+  const path = window.location.pathname;
+  if (path.startsWith("/talk/")) {
+    const talkId = decodeURIComponent(path.replace("/talk/", ""));
+    return { route: "talk", talkId };
+  }
+  if (path === "/talk") return { route: "talk", talkId: null };
+  if (path === "/roadmap") return { route: "roadmap", talkId: null };
+  if (path === "/about") return { route: "about", talkId: null };
+  return { route: "home", talkId: null };
 };
 
 function App() {
   const [theme, setTheme] = useState<"light" | "dark">(() => getInitialTheme());
-  const [route, setRoute] = useState<Route>(() => getInitialRoute());
+  const [{ route: initialRoute, talkId: initialTalkId }] = useState(parseLocation);
+  const [route, setRoute] = useState<Route>(initialRoute);
 
   const [talksIndex, setTalksIndex] = useState<TalkMetadata[]>([]);
   const [indexLoading, setIndexLoading] = useState(true);
@@ -69,7 +76,7 @@ function App() {
   const [featuredLoading, setFeaturedLoading] = useState(false);
   const [featuredError, setFeaturedError] = useState<string | null>(null);
 
-  const [selectedTalkId, setSelectedTalkId] = useState<string | null>(null);
+  const [selectedTalkId, setSelectedTalkId] = useState<string | null>(initialTalkId);
 
   const [nowPlaying, setNowPlaying] = useState<{ talk: Talk; position: number } | null>(null);
   const [inlinePlaying, setInlinePlaying] = useState<{ talk: Talk; route: Route; position: number } | null>(null);
@@ -80,18 +87,30 @@ function App() {
   }, [theme]);
 
   useEffect(() => {
-    const handlePop = () => setRoute(getInitialRoute());
+    const handlePop = () => {
+      const { route: parsedRoute, talkId } = parseLocation();
+      setRoute(parsedRoute);
+      setSelectedTalkId(talkId);
+    };
     window.addEventListener("popstate", handlePop);
     return () => window.removeEventListener("popstate", handlePop);
   }, []);
 
   useEffect(() => {
     const path =
-      route === "roadmap" ? "/roadmap" : route === "talk" ? "/talk" : route === "about" ? "/about" : "/";
+      route === "roadmap"
+        ? "/roadmap"
+        : route === "talk"
+        ? selectedTalkId
+          ? `/talk/${encodeURIComponent(selectedTalkId)}`
+          : "/talk"
+        : route === "about"
+        ? "/about"
+        : "/";
     if (window.location.pathname !== path) {
       window.history.pushState({}, "", path);
     }
-  }, [route]);
+  }, [route, selectedTalkId]);
 
   useEffect(() => {
     if (inlinePlaying && inlinePlaying.route !== route && !nowPlaying) {

@@ -73,7 +73,9 @@ function TalkDetail({
   }
 
   const transcriptParagraphs = talk.transcript
-    .split(/\n\s*\n/)
+    .replace(/\\n/g, "\n") // handle escaped newlines that arrived as literal backslash-n
+    .replace(/\r\n/g, "\n")
+    .split(/\n+/) // treat single or multiple newlines as paragraph separators
     .map((paragraph) => paragraph.trim())
     .filter(Boolean);
 
@@ -156,14 +158,12 @@ function TalkDetail({
             {talk.tags?.length ? (
               <>
                 <dt>Tags</dt>
-                <dd>
-                  <div className="talk-detail__tags">
-                    {talk.tags.map((tag) => (
-                      <span key={tag} className="tag">
-                        {tag}
-                      </span>
-                    ))}
-                  </div>
+                <dd className="talk-detail__tags">
+                  {talk.tags.map((tag) => (
+                    <span key={tag} className="tag">
+                      {tag}
+                    </span>
+                  ))}
                 </dd>
               </>
             ) : null}
@@ -212,9 +212,6 @@ function TalkDetail({
       <div className="talk-detail__card transcript">
         <div className="transcript__header">
           <h3>Transcript</h3>
-          {talk.duration || talk.length ? (
-            <span className="pill pill--subtle">{talk.duration ?? talk.length}</span>
-          ) : null}
         </div>
         {talk.summary ? <p className="talk-detail__summary-text">{talk.summary}</p> : null}
         <div className="transcript__body">
