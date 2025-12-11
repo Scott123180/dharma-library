@@ -1,42 +1,58 @@
-import { useEffect, useRef } from "react";
-
-export type FullTalk = {
-  title: string;
-  teacher: string;
-  duration: string;
-  location: string;
-  date: string;
-  audioUrl?: string;
-  summary?: string;
-  collection?: string;
-  track?: string;
-  koanCase?: string;
-  catalogId?: string;
-  trainingQuarter?: string;
-  contributedBy?: string;
-  resourceId?: string;
-  transcript: string[];
-  caption?: string;
-};
+import { useEffect, useRef, useState } from "react";
+import { fetchTalk } from "../api/talks";
+import { Talk } from "../types/talk";
 
 type TalkDetailProps = {
-  talk: FullTalk;
-  onPlay?: (talk: FullTalk) => void;
-  onInlinePlay?: (talk: FullTalk) => void;
+  talkId: string;
+  onPlay?: (talk: Talk) => void;
+  onInlinePlay?: (talk: Talk) => void;
   onInlineProgress?: (seconds: number) => void;
   inlineActive?: boolean;
   inlinePosition?: number;
+  onBack?: () => void;
 };
 
 function TalkDetail({
-  talk,
+  talkId,
   onPlay,
   onInlinePlay,
   onInlineProgress,
   inlineActive,
-  inlinePosition = 0
+  inlinePosition = 0,
+  onBack
 }: TalkDetailProps) {
+  const [talk, setTalk] = useState<Talk | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const audioRef = useRef<HTMLAudioElement | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    const load = async () => {
+      setLoading(true);
+      try {
+        const data = await fetchTalk(talkId);
+        if (!cancelled) {
+          setTalk(data);
+          setError(null);
+        }
+      } catch (err) {
+        if (!cancelled) {
+          setError(err instanceof Error ? err.message : "Unknown error");
+          setTalk(null);
+        }
+      } finally {
+        if (!cancelled) {
+          setLoading(false);
+        }
+      }
+    };
+    load();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [talkId]);
 
   useEffect(() => {
     if (!inlineActive && audioRef.current) {
@@ -44,20 +60,44 @@ function TalkDetail({
     }
   }, [inlineActive]);
 
+  if (loading) {
+    return <p>Loading talk…</p>;
+  }
+
+  if (error) {
+    return <p className="error-text">Failed to load talk: {error}</p>;
+  }
+
+  if (!talk) {
+    return null;
+  }
+
+  const transcriptParagraphs = talk.transcript
+    .split(/\n\s*\n/)
+    .map((paragraph) => paragraph.trim())
+    .filter(Boolean);
+
+  const metaBits = [talk.teacher, talk.location, talk.date, talk.duration ?? talk.length]
+    .filter(Boolean)
+    .join(" · ");
+
   return (
     <article className="talk-detail">
       <div className="talk-detail__header">
         <div>
           <p className="section__eyebrow">Talk</p>
           <h2>{talk.title}</h2>
-          <p className="talk-detail__meta">
-            {talk.teacher} · {talk.location} · {talk.date} · {talk.duration}
-          </p>
+          {metaBits ? <p className="talk-detail__meta">{metaBits}</p> : null}
           {talk.caption ? <p className="talk-detail__caption">{talk.caption}</p> : null}
         </div>
         <div className="talk-detail__pills">
-          <span className="pill">Audio</span>
+          {talk.audioUrl ? <span className="pill">Audio</span> : null}
           <span className="pill pill--subtle">Transcript</span>
+          {onBack ? (
+            <button className="btn btn-ghost" onClick={onBack}>
+              Back to list
+            </button>
+          ) : null}
         </div>
       </div>
 
@@ -107,6 +147,26 @@ function TalkDetail({
                 <dd>{talk.contributedBy}</dd>
               </>
             ) : null}
+            {talk.retreat ? (
+              <>
+                <dt>Retreat</dt>
+                <dd>{talk.retreat}</dd>
+              </>
+            ) : null}
+            {talk.tags?.length ? (
+              <>
+                <dt>Tags</dt>
+                <dd>
+                  <div className="talk-detail__tags">
+                    {talk.tags.map((tag) => (
+                      <span key={tag} className="tag">
+                        {tag}
+                      </span>
+                    ))}
+                  </div>
+                </dd>
+              </>
+            ) : null}
           </dl>
         </div>
 
@@ -138,8 +198,8 @@ function TalkDetail({
                   Pop out mini player
                 </button>
                 <p className="talk-detail__note">
-                  Play inline or pop out. If you leave this page while playing inline, we&apos;ll
-                  move it to the mini player so it keeps going.
+                  Play inline or pop out. If you leave this page while playing inline, we&apos;ll move
+                  it to the mini player so it keeps going.
                 </p>
               </div>
             </div>
@@ -152,11 +212,13 @@ function TalkDetail({
       <div className="talk-detail__card transcript">
         <div className="transcript__header">
           <h3>Transcript</h3>
-          <span className="pill pill--subtle">{talk.duration}</span>
+          {talk.duration || talk.length ? (
+            <span className="pill pill--subtle">{talk.duration ?? talk.length}</span>
+          ) : null}
         </div>
         {talk.summary ? <p className="talk-detail__summary-text">{talk.summary}</p> : null}
         <div className="transcript__body">
-          {talk.transcript.map((paragraph, index) => (
+          {transcriptParagraphs.map((paragraph, index) => (
             <p key={index}>{paragraph}</p>
           ))}
         </div>

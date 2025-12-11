@@ -1,20 +1,21 @@
-import TalkDetail, { FullTalk } from "../components/TalkDetail";
+import TalkDetail from "../components/TalkDetail";
+import { Talk } from "../types/talk";
 
 type TalkPageProps = {
-  talk: FullTalk;
+  talkId: string;
   onNavigate?: (route: "home" | "roadmap" | "talk" | "about") => void;
-  onPlay?: (talk: FullTalk) => void;
-  onInlinePlay?: (talk: FullTalk) => void;
+  onPlay?: (talk: Talk) => void;
+  onInlinePlay?: (talk: Talk) => void;
   onInlineProgress?: (seconds: number) => void;
 };
 
-function TalkPage({ talk, onNavigate, onPlay, onInlinePlay, onInlineProgress }: TalkPageProps) {
+function TalkPage({ talkId, onNavigate, onPlay, onInlinePlay, onInlineProgress }: TalkPageProps) {
   return (
     <section className="talk-page">
       <div className="section__header">
         <div>
           <p className="section__eyebrow">Transcript & audio</p>
-          <h1>{talk.title}</h1>
+          <h1>Read the full transcript</h1>
           <p className="section__subtitle">
             Read the full transcript and listen alongside. Tap back to the library anytime.
           </p>
@@ -27,7 +28,7 @@ function TalkPage({ talk, onNavigate, onPlay, onInlinePlay, onInlineProgress }: 
       </div>
 
       <TalkDetail
-        talk={talk}
+        talkId={talkId}
         onPlay={onPlay}
         onInlinePlay={onInlinePlay}
         onInlineProgress={onInlineProgress}

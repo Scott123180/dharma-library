@@ -1,41 +1,15 @@
 import { useEffect, useState } from "react";
-import Header from "./components/Header";
-import Footer from "./components/Footer";
-import FeatureCard from "./components/FeatureCard";
-import TalkCard, { Talk } from "./components/TalkCard";
-import TalkDetail, { FullTalk } from "./components/TalkDetail";
+import { fetchTalk, fetchTalksIndex } from "./api/talks";
 import FeaturedTalk from "./components/FeaturedTalk";
-import RoadmapPage from "./pages/RoadmapPage";
-import TalkPage from "./pages/TalkPage";
-import AboutPage from "./pages/AboutPage";
+import FeatureCard from "./components/FeatureCard";
+import Footer from "./components/Footer";
+import Header from "./components/Header";
 import PlayerBar from "./components/PlayerBar";
-
-const talks: Talk[] = [
-  {
-    title: "Breath as a Home Base",
-    teacher: "Ven. Ananda",
-    length: "18 min",
-    summary:
-      "A concise walk-through of returning to the breath to steady attention and soften reactivity during daily life.",
-    tags: ["mindfulness", "beginner", "foundational"]
-  },
-  {
-    title: "Working with the Fires",
-    teacher: "Ajahn Sumedho",
-    length: "42 min",
-    summary:
-      "On anger, craving, and restlessness as natural weather patterns of the heart, and how to meet them with patience.",
-    tags: ["emotions", "sila", "practice"]
-  },
-  {
-    title: "Stillness in Motion",
-    teacher: "Roshi Mira",
-    length: "27 min",
-    summary:
-      "Zen-flavored guidance on carrying the cushion into commuting, caretaking, and conflict without losing clarity.",
-    tags: ["zen", "daily-life", "clarity"]
-  }
-];
+import TalkDetail from "./components/TalkDetail";
+import TalksList from "./components/TalksList";
+import AboutPage from "./pages/AboutPage";
+import RoadmapPage from "./pages/RoadmapPage";
+import { Talk, TalkMetadata } from "./types/talk";
 
 const features = [
   {
@@ -57,30 +31,6 @@ const features = [
     status: "In discovery"
   }
 ];
-
-const featuredTalk: FullTalk = {
-  title: "Neither The Wind Nor The Flag",
-  teacher: "John Daido Loori",
-  duration: "1:28:44 (approx)",
-  location: "Zen Mountain Monastery",
-  date: "1981-11-20 14:30",
-  audioUrl: "https://media-archive.zmmapple.com/pages/download.php?direct=1&ref=30594&ext=mp3",
-  collection: "Gateless Gate",
-  track: "29",
-  koanCase: "29",
-  catalogId: "66",
-  trainingQuarter: "1981 Fall",
-  contributedBy: "Archivist",
-  resourceId: "30594",
-  caption: "Koan: Not the wind, not the flag—mind is moving.",
-  summary:
-    "Daido Roshi uses the koan of the wind and flag to point back to the mind that names, chases, and resists what it senses. Instead of trying to still experience, the talk invites resting in awareness itself—seeing movement without being moved by it.",
-  transcript: [
-    "A monk once pointed to a flag rippling in the wind and asked, “Is it the wind that moves, or the flag that moves?” The teacher replied, “Neither the wind nor the flag. It is mind that moves.”",
-    "In this talk Daido Roshi unpacks how we chase movement in our experience. When we sit, we see the mind hurry to label every sensation—wind, flag, self—missing the direct taste of change itself.",
-    "Practice invites us to meet each flicker of sensation as it is, without trying to nail it down. Zazen isn’t about stopping the wind or stilling the flag; it’s learning to rest in the awareness that holds them both."
-  ]
-};
 
 const getInitialTheme = (): "light" | "dark" => {
   if (typeof window === "undefined") {
@@ -109,8 +59,20 @@ const getInitialRoute = (): Route => {
 function App() {
   const [theme, setTheme] = useState<"light" | "dark">(() => getInitialTheme());
   const [route, setRoute] = useState<Route>(() => getInitialRoute());
-  const [nowPlaying, setNowPlaying] = useState<{ talk: FullTalk; position: number } | null>(null);
-  const [inlinePlaying, setInlinePlaying] = useState<{ talk: FullTalk; route: Route; position: number } | null>(null);
+
+  const [talksIndex, setTalksIndex] = useState<TalkMetadata[]>([]);
+  const [indexLoading, setIndexLoading] = useState(true);
+  const [indexError, setIndexError] = useState<string | null>(null);
+
+  const [featuredTalkId, setFeaturedTalkId] = useState<string | null>(null);
+  const [featuredTalk, setFeaturedTalk] = useState<Talk | null>(null);
+  const [featuredLoading, setFeaturedLoading] = useState(false);
+  const [featuredError, setFeaturedError] = useState<string | null>(null);
+
+  const [selectedTalkId, setSelectedTalkId] = useState<string | null>(null);
+
+  const [nowPlaying, setNowPlaying] = useState<{ talk: Talk; position: number } | null>(null);
+  const [inlinePlaying, setInlinePlaying] = useState<{ talk: Talk; route: Route; position: number } | null>(null);
 
   useEffect(() => {
     document.documentElement.setAttribute("data-theme", theme);
@@ -132,27 +94,92 @@ function App() {
   }, [route]);
 
   useEffect(() => {
-    if (
-      inlinePlaying &&
-      inlinePlaying.route !== route &&
-      !nowPlaying
-    ) {
+    if (inlinePlaying && inlinePlaying.route !== route && !nowPlaying) {
       setNowPlaying({ talk: inlinePlaying.talk, position: inlinePlaying.position });
       setInlinePlaying(null);
     }
   }, [route, inlinePlaying, nowPlaying]);
 
+  useEffect(() => {
+    let cancelled = false;
+    const pickFeatured = (list: TalkMetadata[]) => {
+      const withAudio = list.find((t) => t.audioUrl);
+      return withAudio?.id ?? list[0]?.id ?? null;
+    };
+
+    const loadIndex = async () => {
+      setIndexLoading(true);
+      try {
+        const data = await fetchTalksIndex();
+        if (!cancelled) {
+          setTalksIndex(data);
+          setIndexError(null);
+          setFeaturedTalkId((current) => current ?? pickFeatured(data));
+          setSelectedTalkId((current) => current ?? data[0]?.id ?? null);
+        }
+      } catch (err) {
+        if (!cancelled) {
+          setIndexError(err instanceof Error ? err.message : "Unknown error");
+        }
+      } finally {
+        if (!cancelled) {
+          setIndexLoading(false);
+        }
+      }
+    };
+
+    loadIndex();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!featuredTalkId) {
+      setFeaturedTalk(null);
+      return;
+    }
+
+    let cancelled = false;
+    const loadFeaturedTalk = async () => {
+      setFeaturedLoading(true);
+      try {
+        const data = await fetchTalk(featuredTalkId);
+        if (!cancelled) {
+          setFeaturedTalk(data);
+          setFeaturedError(null);
+        }
+      } catch (err) {
+        if (!cancelled) {
+          setFeaturedError(err instanceof Error ? err.message : "Unknown error");
+          setFeaturedTalk(null);
+        }
+      } finally {
+        if (!cancelled) {
+          setFeaturedLoading(false);
+        }
+      }
+    };
+
+    loadFeaturedTalk();
+    return () => {
+      cancelled = true;
+    };
+  }, [featuredTalkId]);
+
   const toggleTheme = () => setTheme((prev) => (prev === "dark" ? "light" : "dark"));
   const navigate = (next: Route) => setRoute(next);
-  const handlePlay = (talk: FullTalk) => {
-    const startAt =
-      inlinePlaying && inlinePlaying.talk.title === talk.title ? inlinePlaying.position : 0;
+
+  const handlePlay = (talk: Talk) => {
+    const startAt = inlinePlaying && inlinePlaying.talk.id === talk.id ? inlinePlaying.position : 0;
     setNowPlaying({ talk, position: startAt });
     setInlinePlaying(null);
   };
-  const handleInlinePlay = (talk: FullTalk) => {
+
+  const handleInlinePlay = (talk: Talk) => {
     setInlinePlaying({ talk, route, position: 0 });
   };
+
   const handleInlineProgress = (seconds: number) => {
     if (inlinePlaying) {
       setInlinePlaying({ ...inlinePlaying, position: seconds });
@@ -164,6 +191,15 @@ function App() {
       setNowPlaying({ ...nowPlaying, position: seconds });
     }
   };
+
+  const handleSelectTalk = (id: string) => {
+    setSelectedTalkId(id);
+    setNowPlaying(null);
+    navigate("talk");
+  };
+
+  const activeInlineTalkId =
+    inlinePlaying && inlinePlaying.route === route ? inlinePlaying.talk.id : null;
 
   return (
     <div className="page">
@@ -182,7 +218,14 @@ function App() {
                 search experience are on the way.
               </p>
               <div className="hero__actions">
-                <button className="btn btn-primary" onClick={() => navigate("talk")}>
+                <button
+                  className="btn btn-primary"
+                  onClick={() => {
+                    const firstId = talksIndex[0]?.id ?? null;
+                    setSelectedTalkId((current) => current ?? firstId);
+                    navigate("talk");
+                  }}
+                >
                   Start reading
                 </button>
                 <button className="btn btn-ghost" onClick={() => navigate("roadmap")}>
@@ -192,18 +235,23 @@ function App() {
             </section>
 
             <section id="feature-talk" className="section">
-              <FeaturedTalk
-                talk={featuredTalk}
-                onPlay={handlePlay}
-                onInlinePlay={handleInlinePlay}
-                onInlineProgress={handleInlineProgress}
-                inlineActive={
-                  inlinePlaying?.talk.title === featuredTalk.title && inlinePlaying.route === route
-                }
-                inlinePosition={
-                  inlinePlaying?.talk.title === featuredTalk.title ? inlinePlaying.position : 0
-                }
-              />
+              {featuredLoading ? (
+                <p>Loading featured talk…</p>
+              ) : featuredTalk ? (
+                <FeaturedTalk
+                  talk={featuredTalk}
+                  onPlay={handlePlay}
+                  onInlinePlay={handleInlinePlay}
+                  onInlineProgress={handleInlineProgress}
+                  inlineActive={activeInlineTalkId === featuredTalk.id}
+                  inlinePosition={activeInlineTalkId === featuredTalk.id ? inlinePlaying?.position ?? 0 : 0}
+                  onViewTalk={(talk) => handleSelectTalk(talk.id)}
+                />
+              ) : featuredError ? (
+                <p className="error-text">Unable to load featured talk: {featuredError}</p>
+              ) : (
+                <p>No featured talk available yet.</p>
+              )}
             </section>
 
             <section id="talks" className="section">
@@ -212,26 +260,17 @@ function App() {
                   <p className="section__eyebrow">Featured reads</p>
                   <h2>Talks ready for you today</h2>
                   <p className="section__subtitle">
-                    Browse a few hand-picked samples while we finish ingesting the
-                    full archive. Each page is formatted for calm, focused reading.
+                    Browse a few hand-picked samples while we finish ingesting the full archive. Each
+                    page is formatted for calm, focused reading.
                   </p>
                 </div>
-                <button className="btn btn-ghost" onClick={() => navigate("talk")}>
-                  View full library (soon)
-                </button>
               </div>
-              <div className="cards-grid">
-                {talks.map((talk) => (
-                  <TalkCard
-                    key={talk.title}
-                    talk={talk}
-                    onOpen={() => {
-                      setNowPlaying(null);
-                      navigate("talk");
-                    }}
-                  />
-                ))}
-              </div>
+              <TalksList
+                initialTalks={talksIndex}
+                loading={indexLoading}
+                error={indexError}
+                onSelect={handleSelectTalk}
+              />
             </section>
 
             <section className="section muted">
@@ -240,9 +279,8 @@ function App() {
                   <p className="section__eyebrow">Built for practice</p>
                   <h2>Thoughtful features on the way</h2>
                   <p className="section__subtitle">
-                    We are focusing on simplicity first: readable transcripts,
-                    structured metadata, and audio that keeps you close to the
-                    teacher&apos;s original voice.
+                    We are focusing on simplicity first: readable transcripts, structured metadata,
+                    and audio that keeps you close to the teacher&apos;s original voice.
                   </p>
                 </div>
               </div>
@@ -258,9 +296,8 @@ function App() {
                 <p className="section__eyebrow">For teachers & sanghas</p>
                 <h2>Want your talks included?</h2>
                 <p className="section__subtitle">
-                  We can ingest recordings, run careful transcripts, and keep your
-                  teachings discoverable. Drop a note and we&apos;ll reach out as
-                  the library opens.
+                  We can ingest recordings, run careful transcripts, and keep your teachings
+                  discoverable. Drop a note and we&apos;ll reach out as the library opens.
                 </p>
               </div>
               <div className="cta__actions">
@@ -276,13 +313,38 @@ function App() {
         ) : route === "roadmap" ? (
           <RoadmapPage onNavigate={navigate} />
         ) : route === "talk" ? (
-          <TalkPage
-            talk={featuredTalk}
-            onNavigate={navigate}
-            onPlay={handlePlay}
-            onInlinePlay={handleInlinePlay}
-            onInlineProgress={handleInlineProgress}
-          />
+          <section className="talk-page">
+            <div className="section__header">
+              <div>
+                <p className="section__eyebrow">Transcript library</p>
+                <h1>Browse Dharma talks</h1>
+                <p className="section__subtitle">Loaded from {indexLoading ? "…" : "the index"}.</p>
+              </div>
+              <div className="cta__actions">
+                <button className="btn btn-ghost" onClick={() => navigate("home")}>
+                  Back to home
+                </button>
+              </div>
+            </div>
+            <div className="talk-page__detail">
+              {selectedTalkId ? (
+                <TalkDetail
+                  talkId={selectedTalkId}
+                  onPlay={handlePlay}
+                  onInlinePlay={handleInlinePlay}
+                  onInlineProgress={handleInlineProgress}
+                  inlineActive={activeInlineTalkId === selectedTalkId}
+                  inlinePosition={activeInlineTalkId === selectedTalkId ? inlinePlaying?.position ?? 0 : 0}
+                  onBack={() => {
+                    setSelectedTalkId(null);
+                    navigate("home");
+                  }}
+                />
+              ) : (
+                <p>Select a talk on the home page to read.</p>
+              )}
+            </div>
+          </section>
         ) : (
           <AboutPage />
         )}

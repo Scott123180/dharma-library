@@ -1,14 +1,14 @@
 import { useEffect, useRef } from "react";
-import { FullTalk } from "./TalkDetail";
+import { Talk } from "../types/talk";
 
 type FeaturedTalkProps = {
-  talk: FullTalk;
-  onPlay?: (talk: FullTalk) => void;
-  onInlinePlay?: (talk: FullTalk) => void;
+  talk: Talk;
+  onPlay?: (talk: Talk) => void;
+  onInlinePlay?: (talk: Talk) => void;
   onInlineProgress?: (seconds: number) => void;
   inlineActive?: boolean;
   inlinePosition?: number;
-  onViewTalk?: (talk: FullTalk) => void;
+  onViewTalk?: (talk: Talk) => void;
 };
 
 function FeaturedTalk({
@@ -21,6 +21,9 @@ function FeaturedTalk({
   onViewTalk
 }: FeaturedTalkProps) {
   const audioRef = useRef<HTMLAudioElement | null>(null);
+  const metaBits = [talk.teacher, talk.location, talk.date, talk.duration ?? talk.length]
+    .filter(Boolean)
+    .join(" · ");
 
   useEffect(() => {
     if (!inlineActive && audioRef.current) {
@@ -34,14 +37,12 @@ function FeaturedTalk({
         <div>
           <p className="section__eyebrow">Featured talk</p>
           <h2>{talk.title}</h2>
-          <p className="featured-talk__meta">
-            {talk.teacher} · {talk.location} · {talk.date} · {talk.duration}
-          </p>
+          {metaBits ? <p className="featured-talk__meta">{metaBits}</p> : null}
           {talk.caption ? <p className="featured-talk__caption">{talk.caption}</p> : null}
           {talk.summary ? <p className="featured-talk__summary">{talk.summary}</p> : null}
         </div>
         <div className="featured-talk__actions">
-          <span className="pill">Audio</span>
+          {talk.audioUrl ? <span className="pill">Audio</span> : null}
           <span className="pill pill--subtle">Transcript</span>
           <button className="btn btn-primary" onClick={() => onViewTalk?.(talk)}>
             Go to talk page
@@ -52,7 +53,9 @@ function FeaturedTalk({
       <div className="featured-talk__card">
         <div className="featured-talk__card-header">
           <h3>Listen inline</h3>
-          <span className="pill pill--subtle">{talk.duration}</span>
+          {talk.duration || talk.length ? (
+            <span className="pill pill--subtle">{talk.duration ?? talk.length}</span>
+          ) : null}
         </div>
         {talk.audioUrl ? (
           <>

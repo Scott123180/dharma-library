@@ -1,8 +1,8 @@
 import { useEffect, useRef } from "react";
-import { FullTalk } from "./TalkDetail";
+import { Talk } from "../types/talk";
 
 type PlayerBarProps = {
-  talk: FullTalk | null;
+  talk: Talk | null;
   startAt?: number;
   onClose: () => void;
   onProgress?: (seconds: number) => void;

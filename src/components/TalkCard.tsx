@@ -1,31 +1,30 @@
-export type Talk = {
-  title: string;
-  teacher: string;
-  length: string;
-  summary: string;
-  tags: string[];
-};
+import { MouseEvent } from "react";
+import { TalkMetadata } from "../types/talk";
 
 type TalkCardProps = {
-  talk: Talk;
-  onOpen?: () => void;
+  talk: TalkMetadata;
+  onOpen?: (id: string) => void;
 };
 
 function TalkCard({ talk, onOpen }: TalkCardProps) {
-  const handleOpen = (event: React.MouseEvent<HTMLAnchorElement, MouseEvent>) => {
+  const handleOpen = (event: MouseEvent<HTMLAnchorElement>) => {
     if (!onOpen) return;
     event.preventDefault();
-    onOpen();
+    onOpen(talk.id);
   };
+
+  const durationLabel = talk.length ?? talk.duration;
 
   return (
     <article className="talk-card">
       <div className="talk-card__meta">
         <span className="pill">{talk.teacher}</span>
-        <span className="pill pill--subtle">{talk.length}</span>
+        {durationLabel ? <span className="pill pill--subtle">{durationLabel}</span> : null}
       </div>
       <h3>{talk.title}</h3>
-      <p className="talk-card__summary">{talk.summary}</p>
+      <p className="talk-card__summary">
+        {talk.summary ?? "Transcript ready to read. Tap to open the full text."}
+      </p>
       <div className="talk-card__tags">
         {talk.tags.map((tag) => (
           <span key={tag} className="tag">
@@ -34,7 +33,7 @@ function TalkCard({ talk, onOpen }: TalkCardProps) {
         ))}
       </div>
       <a className="link" href="#" onClick={handleOpen}>
-        Open transcript (sample)
+        Open transcript
       </a>
     </article>
   );
