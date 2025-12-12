@@ -33,3 +33,6 @@ Visit the printed local URL (defaults to `http://localhost:5173`). Build for pro
 - Add audio URLs and a player component when files are ready.
 - Hook the search bar into your search-as-a-service endpoint once available.
 - Swap placeholder links with real talk pages once the library is ingested.
+
+## Cloudfront distribution
+Text files can be accessed via cloudfront distribution. Distribution here: `d2f7aw4s8anu7j.cloudfront.net`
