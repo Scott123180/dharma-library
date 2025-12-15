@@ -25,7 +25,7 @@ function TalkCard({ talk, onOpen }: TalkCardProps) {
       </div>
       <h3>{talk.title}</h3>
       <p className="talk-card__summary">
-        {summary || "Transcript ready to read. Tap to open the full text."}
+        {summary || "Listen to the talk."}
       </p>
       <div className="talk-card__tags">
         {(talk.tags ?? []).map((tag) => (
