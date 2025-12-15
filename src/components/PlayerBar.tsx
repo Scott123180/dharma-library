@@ -58,12 +58,15 @@ function PlayerBar({ talk, startAt = 0, onClose, onProgress }: PlayerBarProps) {
 
   if (!talk || !talk.audioUrl) return null;
 
+  const speaker = talk.speaker || talk.teacher || "Unknown speaker";
+
   return (
     <div className="player-bar">
       <div className="player-bar__info">
         <p className="player-bar__title">{talk.title}</p>
         <p className="player-bar__meta">
-          {talk.teacher} · {talk.duration}
+          {speaker}
+          {talk.duration ? ` · ${talk.duration}` : null}
         </p>
       </div>
       <audio

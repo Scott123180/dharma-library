@@ -1,8 +1,8 @@
 // Central place to decide where talks are loaded from in each mode.
-const isDev = import.meta.env.MODE === "development";
+const isDev = import.meta.env.MODE === "development"; // development is the default vite env
 
 const DEV_BASE_URL = "/dev-data"; // served from public/dev-data when running the dev server
-const PROD_BASE_URL = import.meta.env.VITE_TALKS_CDN_URL ?? "/dev-data"; // fallback keeps things working if env is missing
+const PROD_BASE_URL = "https://d2f7aw4s8anu7j.cloudfront.net";
 
 export const TALKS_BASE_URL = isDev ? DEV_BASE_URL : PROD_BASE_URL;
 

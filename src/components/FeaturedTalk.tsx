@@ -21,9 +21,11 @@ function FeaturedTalk({
   onViewTalk
 }: FeaturedTalkProps) {
   const audioRef = useRef<HTMLAudioElement | null>(null);
-  const metaBits = [talk.teacher, talk.location, talk.date, talk.duration ?? talk.length]
-    .filter(Boolean)
-    .join(" · ");
+  const speaker = talk.speaker || talk.teacher || "Unknown speaker";
+  const durationLabel = talk.duration?.trim();
+  const metaBits = [speaker, talk.location?.trim(), talk.date?.trim(), durationLabel].filter(Boolean).join(" · ");
+  const caption = talk.caption?.trim();
+  const summary = talk.summary?.trim();
 
   useEffect(() => {
     if (!inlineActive && audioRef.current) {
@@ -38,8 +40,8 @@ function FeaturedTalk({
           <p className="section__eyebrow">Featured talk</p>
           <h2>{talk.title}</h2>
           {metaBits ? <p className="featured-talk__meta">{metaBits}</p> : null}
-          {talk.caption ? <p className="featured-talk__caption">{talk.caption}</p> : null}
-          {talk.summary ? <p className="featured-talk__summary">{talk.summary}</p> : null}
+          {caption ? <p className="featured-talk__caption">{caption}</p> : null}
+          {summary ? <p className="featured-talk__summary">{summary}</p> : null}
         </div>
         <div className="featured-talk__actions">
           {talk.audioUrl ? <span className="pill">Audio</span> : null}
@@ -52,10 +54,8 @@ function FeaturedTalk({
 
       <div className="featured-talk__card">
         <div className="featured-talk__card-header">
-          <h3>Listen inline</h3>
-          {talk.duration || talk.length ? (
-            <span className="pill pill--subtle">{talk.duration ?? talk.length}</span>
-          ) : null}
+          <h3>Listen now</h3>
+          {durationLabel ? <span className="pill pill--subtle">{durationLabel}</span> : null}
         </div>
         {talk.audioUrl ? (
           <>

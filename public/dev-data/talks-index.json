@@ -1,44 +1,19 @@
 [
   {
-    "id": "1981-11-20-neither-wind-nor-flag",
-    "title": "Neither The Wind Nor The Flag",
-    "teacher": "John Daido Loori",
-    "date": "1981-11-20",
-    "tags": ["zen", "koan", "gateless-gate"],
-    "summary": "Koan: Not the wind, not the flag—mind is moving. A guided look at resting in awareness itself.",
-    "duration": "1:28:44 (approx)",
+    "audioUrl": "https://media-archive.zmmapple.com/pages/download.php?direct=1&ref=37675&ext=mp3",
+    "catalogId": "AR47",
+    "dataLineage": ["unprocessed"],
+    "date": "2024-07-07 12:59",
+    "duration": "0:44:46",
+    "id": "37675",
+    "koanCase": "45",
+    "koanCollection": "Gateless Gate",
     "location": "Zen Mountain Monastery",
-    "audioUrl": "https://media-archive.zmmapple.com/pages/download.php?direct=1&ref=30594&ext=mp3"
-  },
-  {
-    "id": "2024-03-15-dana-paramita",
-    "title": "Dana Paramita and the Joy of Giving",
-    "teacher": "Sensei X",
-    "date": "2024-03-15",
-    "retreat": "Spring Sesshin",
-    "tags": ["dana", "paramita", "generosity"],
-    "summary": "A gentle encouragement to let generosity become the tone of daily life rather than a special event.",
-    "duration": "18:20",
-    "location": "Mountain Gate Zendo"
-  },
-  {
-    "id": "2024-02-02-breath-home-base",
-    "title": "Breath as a Home Base",
-    "teacher": "Ven. Ananda",
-    "date": "2024-02-02",
-    "tags": ["mindfulness", "beginner", "foundational"],
-    "summary": "Returning to the breath to steady attention and soften reactivity during daily life.",
-    "duration": "22:10",
-    "location": "Forest Refuge"
-  },
-  {
-    "id": "2024-01-12-stillness-in-motion",
-    "title": "Stillness in Motion",
-    "teacher": "Roshi Mira",
-    "date": "2024-01-12",
-    "tags": ["zen", "daily-life", "clarity"],
-    "summary": "Carrying the cushion into commuting, caretaking, and conflict without losing clarity.",
-    "duration": "27:05",
-    "location": "Bright Cloud Monastery"
+    "speaker": "Geoffrey Shugen Arnold",
+    "summary": "",
+    "tags": [],
+    "title": "We The People",
+    "track": "",
+    "trainingQuarter": "2024 Summer"
   }
 ]

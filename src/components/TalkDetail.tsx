@@ -72,6 +72,11 @@ function TalkDetail({
     return null;
   }
 
+  const speaker = talk.speaker || talk.teacher || "Unknown speaker";
+  const durationLabel = talk.duration?.trim();
+  const caption = talk.caption?.trim();
+  const summary = talk.summary?.trim();
+  const koanCollection = talk.koanCollection || talk.collection;
   const transcriptParagraphs = talk.transcript
     .replace(/\\n/g, "\n") // handle escaped newlines that arrived as literal backslash-n
     .replace(/\r\n/g, "\n")
@@ -79,7 +84,7 @@ function TalkDetail({
     .map((paragraph) => paragraph.trim())
     .filter(Boolean);
 
-  const metaBits = [talk.teacher, talk.location, talk.date, talk.duration ?? talk.length]
+  const metaBits = [speaker, talk.location?.trim(), talk.date?.trim(), durationLabel]
     .filter(Boolean)
     .join(" · ");
 
@@ -90,7 +95,7 @@ function TalkDetail({
           <p className="section__eyebrow">Talk</p>
           <h2>{talk.title}</h2>
           {metaBits ? <p className="talk-detail__meta">{metaBits}</p> : null}
-          {talk.caption ? <p className="talk-detail__caption">{talk.caption}</p> : null}
+          {caption ? <p className="talk-detail__caption">{caption}</p> : null}
         </div>
         <div className="talk-detail__pills">
           {talk.audioUrl ? <span className="pill">Audio</span> : null}
@@ -107,10 +112,10 @@ function TalkDetail({
         <div className="talk-detail__card">
           <h3>Details</h3>
           <dl className="meta-grid">
-            {talk.collection ? (
+            {koanCollection ? (
               <>
-                <dt>Collection</dt>
-                <dd>{talk.collection}</dd>
+                <dt>Koan collection</dt>
+                <dd>{koanCollection}</dd>
               </>
             ) : null}
             {talk.track ? (
@@ -131,28 +136,16 @@ function TalkDetail({
                 <dd>{talk.catalogId}</dd>
               </>
             ) : null}
-            {talk.resourceId ? (
-              <>
-                <dt>Resource ID</dt>
-                <dd>{talk.resourceId}</dd>
-              </>
-            ) : null}
             {talk.trainingQuarter ? (
               <>
                 <dt>Training quarter</dt>
                 <dd>{talk.trainingQuarter}</dd>
               </>
             ) : null}
-            {talk.contributedBy ? (
+            {talk.dataLineage?.length ? (
               <>
-                <dt>Contributed by</dt>
-                <dd>{talk.contributedBy}</dd>
-              </>
-            ) : null}
-            {talk.retreat ? (
-              <>
-                <dt>Retreat</dt>
-                <dd>{talk.retreat}</dd>
+                <dt>Data lineage</dt>
+                <dd>{talk.dataLineage.join(", ")}</dd>
               </>
             ) : null}
             {talk.tags?.length ? (
@@ -213,11 +206,13 @@ function TalkDetail({
         <div className="transcript__header">
           <h3>Transcript</h3>
         </div>
-        {talk.summary ? <p className="talk-detail__summary-text">{talk.summary}</p> : null}
+        {summary ? <p className="talk-detail__summary-text">{summary}</p> : null}
         <div className="transcript__body">
-          {transcriptParagraphs.map((paragraph, index) => (
-            <p key={index}>{paragraph}</p>
-          ))}
+          {transcriptParagraphs.length ? (
+            transcriptParagraphs.map((paragraph, index) => <p key={index}>{paragraph}</p>)
+          ) : (
+            <p className="talk-detail__note">Transcript not available yet.</p>
+          )}
         </div>
       </div>
     </article>

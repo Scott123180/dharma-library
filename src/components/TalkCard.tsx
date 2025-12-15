@@ -13,17 +13,19 @@ function TalkCard({ talk, onOpen }: TalkCardProps) {
     onOpen(talk.id);
   };
 
-  const durationLabel = talk.length ?? talk.duration;
+  const speaker = talk.speaker || talk.teacher || "Unknown speaker";
+  const durationLabel = talk.duration?.trim() || undefined;
+  const summary = talk.summary?.trim();
 
   return (
     <article className="talk-card">
       <div className="talk-card__meta">
-        <span className="pill">{talk.teacher}</span>
+        <span className="pill">{speaker}</span>
         {durationLabel ? <span className="pill pill--subtle">{durationLabel}</span> : null}
       </div>
       <h3>{talk.title}</h3>
       <p className="talk-card__summary">
-        {talk.summary ?? "Transcript ready to read. Tap to open the full text."}
+        {summary || "Transcript ready to read. Tap to open the full text."}
       </p>
       <div className="talk-card__tags">
         {talk.tags.map((tag) => (
