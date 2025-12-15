@@ -35,7 +35,7 @@ function TalkCard({ talk, onOpen }: TalkCardProps) {
         ))}
       </div>
       <a className="link" href="#" onClick={handleOpen}>
-        Open transcript
+        Open
       </a>
     </article>
   );
