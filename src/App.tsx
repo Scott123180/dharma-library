@@ -123,8 +123,13 @@ function App() {
   useEffect(() => {
     let cancelled = false;
     const pickFeatured = (list: TalkMetadata[]) => {
-      const withAudio = list.find((t) => t.audioUrl);
-      return withAudio?.id ?? list[0]?.id ?? null;
+      if (list.length === 0) return null;
+      const now = new Date();
+      const month = now.getMonth() + 1;
+      const year = now.getFullYear();
+      const modulusBase = 6000; // roughly the number of talks
+      const index = (year * month) % modulusBase;
+      return list[index % list.length]?.id ?? null;
     };
 
     const loadIndex = async () => {
