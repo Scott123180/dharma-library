@@ -77,12 +77,43 @@ function TalkDetail({
   const caption = talk.caption?.trim();
   const summary = talk.summary?.trim();
   const koanCollection = talk.koanCollection || talk.collection;
-  const transcriptParagraphs = talk.transcript
-    .replace(/\\n/g, "\n") // handle escaped newlines that arrived as literal backslash-n
-    .replace(/\r\n/g, "\n")
-    .split(/\n+/) // treat single or multiple newlines as paragraph separators
-    .map((paragraph) => paragraph.trim())
-    .filter(Boolean);
+  const splitIntoSentences = (text: string) => {
+    const matches = text.match(/[^.!?]+[.!?]+|[^.!?]+$/g);
+    return (matches || [text])
+      .map((sentence) => sentence.trim())
+      .filter(Boolean);
+  };
+
+  const chunkSentences = (sentences: string[], size: number) => {
+    const chunks: string[] = [];
+    for (let i = 0; i < sentences.length; i += size) {
+      chunks.push(sentences.slice(i, i + size).join(" "));
+    }
+    return chunks;
+  };
+
+  const transcriptParagraphs = (() => {
+    const normalized = talk.transcript
+      .replace(/\\n/g, "\n") // handle escaped newlines that arrived as literal backslash-n
+      .replace(/\r\n/g, "\n");
+    const paragraphs = normalized
+      .split(/\n+/) // treat single or multiple newlines as paragraph separators
+      .map((paragraph) => paragraph.trim())
+      .filter(Boolean);
+
+    if (!paragraphs.length) {
+      return [];
+    }
+
+    if (paragraphs.length === 1 && paragraphs[0].length > 400) {
+      const sentences = splitIntoSentences(paragraphs[0]);
+      if (sentences.length > 1) {
+        return chunkSentences(sentences, 2);
+      }
+    }
+
+    return paragraphs;
+  })();
 
   const metaBits = [speaker, talk.location?.trim(), talk.date?.trim(), durationLabel]
     .filter(Boolean)

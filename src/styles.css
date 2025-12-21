@@ -924,6 +924,7 @@ a {
   margin: 0;
   color: var(--muted);
   line-height: 1.6;
+  max-width: 70ch;
 }
 
 .talk-detail__actions {
@@ -983,9 +984,11 @@ a {
 .transcript__body {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 14px;
   color: var(--muted);
-  line-height: 1.6;
+  line-height: 1.7;
+  font-size: 1.02rem;
+  max-width: 70ch;
 }
 
 .transcript__body p {
