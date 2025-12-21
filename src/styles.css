@@ -952,6 +952,56 @@ a {
   word-break: break-word;
 }
 
+.lineage {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+  align-items: start;
+}
+
+.lineage__step {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  text-align: center;
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+.lineage__dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 999px;
+  border: 2px solid var(--border);
+  background: transparent;
+  z-index: 1;
+}
+
+.lineage__track {
+  position: absolute;
+  top: 5px;
+  left: 50%;
+  right: -50%;
+  height: 2px;
+  background: var(--border);
+  z-index: 0;
+}
+
+.lineage__step.is-complete {
+  color: var(--text);
+}
+
+.lineage__step.is-complete .lineage__dot {
+  background: linear-gradient(135deg, var(--accent), var(--accent-strong));
+  border-color: transparent;
+}
+
+.lineage__step.is-complete .lineage__track {
+  background: linear-gradient(90deg, var(--accent), var(--accent-strong));
+}
+
 .talk-detail__tags {
   display: flex;
   flex-wrap: wrap;
@@ -1017,6 +1067,21 @@ a {
 
   .meta-grid {
     grid-template-columns: 1fr;
+  }
+
+  .lineage {
+    grid-template-columns: 1fr;
+    justify-items: start;
+  }
+
+  .lineage__step {
+    flex-direction: row;
+    justify-content: flex-start;
+    text-align: left;
+  }
+
+  .lineage__track {
+    display: none;
   }
 
   .map-card.left,

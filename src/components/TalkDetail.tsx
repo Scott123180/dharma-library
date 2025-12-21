@@ -77,6 +77,18 @@ function TalkDetail({
   const caption = talk.caption?.trim();
   const summary = talk.summary?.trim();
   const koanCollection = talk.koanCollection || talk.collection;
+  const lineageOrder = ["audio_original", "transcript_raw", "transcript_structured"];
+  const lineageLabels: Record<string, string> = {
+    audio_original: "Audio original",
+    transcript_raw: "Transcript raw",
+    transcript_structured: "Transcript structured"
+  };
+  const lineageSet = new Set(talk.dataLineage || []);
+  const lineageSteps = lineageOrder.map((key) => ({
+    key,
+    label: lineageLabels[key] || key,
+    complete: lineageSet.has(key)
+  }));
   const splitIntoSentences = (text: string) => {
     const matches = text.match(/[^.!?]+[.!?]+|[^.!?]+$/g);
     return (matches || [text])
@@ -176,7 +188,23 @@ function TalkDetail({
             {talk.dataLineage?.length ? (
               <>
                 <dt>Data lineage</dt>
-                <dd>{talk.dataLineage.join(", ")}</dd>
+                <dd>
+                  <div className="lineage" role="list">
+                    {lineageSteps.map((step, index) => (
+                      <div
+                        key={step.key}
+                        className={`lineage__step${step.complete ? " is-complete" : ""}`}
+                        role="listitem"
+                      >
+                        <div className="lineage__dot" aria-hidden="true" />
+                        <div className="lineage__label">{step.label}</div>
+                        {index < lineageSteps.length - 1 ? (
+                          <div className="lineage__track" aria-hidden="true" />
+                        ) : null}
+                      </div>
+                    ))}
+                  </div>
+                </dd>
               </>
             ) : null}
             {talk.tags?.length ? (
