@@ -19,6 +19,8 @@ function TalksList({ onSelect, initialTalks, loading, error }: TalksListProps) {
   const [page, setPage] = useState(1);
   const [searchTerm, setSearchTerm] = useState("");
   const [teacherFilter, setTeacherFilter] = useState("all");
+  const [yearFilter, setYearFilter] = useState("all");
+  const [monthFilter, setMonthFilter] = useState("all");
 
   useEffect(() => {
     if (initialTalks) {
@@ -58,7 +60,12 @@ function TalksList({ onSelect, initialTalks, loading, error }: TalksListProps) {
   useEffect(() => {
     // Reset to the first page when filter inputs change.
     setPage(1);
-  }, [searchTerm, teacherFilter]);
+  }, [searchTerm, teacherFilter, yearFilter, monthFilter]);
+
+  useEffect(() => {
+    // Clear month when the year changes so we don't keep stale months.
+    setMonthFilter("all");
+  }, [yearFilter]);
 
   useEffect(() => {
     // Reset to the first page when a new set of talks arrives.
@@ -80,15 +87,70 @@ function TalksList({ onSelect, initialTalks, loading, error }: TalksListProps) {
     return Array.from(set).sort((a, b) => a.localeCompare(b));
   }, [talks]);
 
+  const getDateParts = (value?: string) => {
+    if (!value) return null;
+    const datePart = value.trim().split(" ")[0];
+    const [yearStr, monthStr] = datePart.split("-");
+    const year = Number(yearStr);
+    const month = Number(monthStr);
+    if (!Number.isInteger(year) || !Number.isInteger(month)) return null;
+    if (month < 1 || month > 12) return null;
+    return { year, month };
+  };
+
+  const yearOptions = useMemo(() => {
+    const set = new Set<number>();
+    talks.forEach((talk) => {
+      const parts = getDateParts(talk.date);
+      if (parts) {
+        set.add(parts.year);
+      }
+    });
+    return Array.from(set).sort((a, b) => b - a);
+  }, [talks]);
+
+  const monthLabels = [
+    "January",
+    "February",
+    "March",
+    "April",
+    "May",
+    "June",
+    "July",
+    "August",
+    "September",
+    "October",
+    "November",
+    "December"
+  ];
+
+  const monthOptions = useMemo(() => {
+    if (yearFilter === "all") return [];
+    const yearNumber = Number(yearFilter);
+    const set = new Set<number>();
+    talks.forEach((talk) => {
+      const parts = getDateParts(talk.date);
+      if (parts && parts.year === yearNumber) {
+        set.add(parts.month);
+      }
+    });
+    return Array.from(set).sort((a, b) => a - b);
+  }, [talks, yearFilter]);
+
   const filteredTalks = useMemo(() => {
     const term = searchTerm.trim().toLowerCase();
     return talks.filter((talk) => {
       const matchesTeacher = teacherFilter === "all" || teacherLabel(talk) === teacherFilter;
       const title = (talk.title || "").toLowerCase();
       const matchesSearch = term === "" || title.includes(term);
-      return matchesTeacher && matchesSearch;
+      const parts = getDateParts(talk.date);
+      const matchesYear =
+        yearFilter === "all" || (parts && String(parts.year) === yearFilter);
+      const matchesMonth =
+        monthFilter === "all" || (parts && parts.month === Number(monthFilter));
+      return matchesTeacher && matchesSearch && matchesYear && matchesMonth;
     });
-  }, [talks, searchTerm, teacherFilter]);
+  }, [talks, searchTerm, teacherFilter, yearFilter, monthFilter]);
 
   const totalPages = Math.max(1, Math.ceil(filteredTalks.length / PAGE_SIZE));
   const currentPage = Math.min(page, totalPages);
@@ -138,6 +200,39 @@ function TalksList({ onSelect, initialTalks, loading, error }: TalksListProps) {
             {teacherOptions.map((name) => (
               <option key={name} value={name}>
                 {name}
+              </option>
+            ))}
+          </select>
+        </label>
+        <label className="filter">
+          <span className="filter__label">Year</span>
+          <select
+            className="input"
+            value={yearFilter}
+            onChange={(event) => setYearFilter(event.target.value)}
+          >
+            <option value="all">Any year</option>
+            {yearOptions.map((year) => (
+              <option key={year} value={String(year)}>
+                {year}
+              </option>
+            ))}
+          </select>
+        </label>
+        <label className="filter">
+          <span className="filter__label">Month</span>
+          <select
+            className="input"
+            value={monthFilter}
+            onChange={(event) => setMonthFilter(event.target.value)}
+            disabled={yearFilter === "all"}
+          >
+            <option value="all">
+              {yearFilter === "all" ? "Select a year first" : "Any month"}
+            </option>
+            {monthOptions.map((month) => (
+              <option key={month} value={String(month)}>
+                {monthLabels[month - 1]}
               </option>
             ))}
           </select>

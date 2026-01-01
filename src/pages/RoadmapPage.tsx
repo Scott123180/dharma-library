@@ -89,8 +89,8 @@ function RoadmapPage({ onNavigate }: RoadmapPageProps) {
           </p>
         </div>
         <div className="cta__actions">
-          <a className="btn btn-primary" href="mailto:hello@dharmalibrary.link">
-            Email the team
+          <a className="btn btn-primary" href="mailto:me@scotthansen.io">
+            Send me an email
           </a>
           <a
             className="btn btn-ghost"
