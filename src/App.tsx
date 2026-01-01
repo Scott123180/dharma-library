@@ -53,7 +53,8 @@ const parseLocation = (): { route: Route; talkId: string | null } => {
 
   const path = window.location.pathname;
   if (path.startsWith("/talk/")) {
-    const talkId = decodeURIComponent(path.replace("/talk/", ""));
+    const rawId = decodeURIComponent(path.replace("/talk/", ""));
+    const talkId = rawId.replace(/^\/+|\/+$/g, "") || null;
     return { route: "talk", talkId };
   }
   if (path === "/talk") return { route: "talk", talkId: null };

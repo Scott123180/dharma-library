@@ -8,4 +8,7 @@ const PROD_BASE_URL = "https://d2f7aw4s8anu7j.cloudfront.net";
 export const TALKS_BASE_URL = isDev ? DEV_BASE_URL : PROD_BASE_URL;
 
 export const TALKS_INDEX_URL = `${TALKS_BASE_URL}/talks-index.json`;
-export const talkUrl = (id: string) => `${TALKS_BASE_URL}/talks/${id}.json`;
+const normalizeTalkId = (id: string) => id.replace(/^\/+|\/+$/g, "");
+
+export const talkUrl = (id: string) =>
+  `${TALKS_BASE_URL}/talks/${normalizeTalkId(id)}.json`;
