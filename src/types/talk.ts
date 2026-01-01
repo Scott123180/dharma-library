@@ -15,6 +15,7 @@ export interface TalkMetadata {
   catalogId?: string;
   trainingQuarter?: string;
   dataLineage?: string[];
+  ts?: number;
   retreat?: string;
   contributedBy?: string;
   // Legacy fields kept optional for backwards compatibility during the migration.

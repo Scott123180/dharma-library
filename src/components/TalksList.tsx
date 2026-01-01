@@ -21,6 +21,7 @@ function TalksList({ onSelect, initialTalks, loading, error }: TalksListProps) {
   const [teacherFilter, setTeacherFilter] = useState("all");
   const [yearFilter, setYearFilter] = useState("all");
   const [monthFilter, setMonthFilter] = useState("all");
+  const [stageFilter, setStageFilter] = useState("all");
 
   useEffect(() => {
     if (initialTalks) {
@@ -60,7 +61,7 @@ function TalksList({ onSelect, initialTalks, loading, error }: TalksListProps) {
   useEffect(() => {
     // Reset to the first page when filter inputs change.
     setPage(1);
-  }, [searchTerm, teacherFilter, yearFilter, monthFilter]);
+  }, [searchTerm, teacherFilter, yearFilter, monthFilter, stageFilter]);
 
   useEffect(() => {
     // Clear month when the year changes so we don't keep stale months.
@@ -124,6 +125,14 @@ function TalksList({ onSelect, initialTalks, loading, error }: TalksListProps) {
     "December"
   ];
 
+  const stageOptions = [
+    { value: "0", label: "Unknown or unprocessed" },
+    { value: "1", label: "Audio only" },
+    { value: "2", label: "Raw transcript" },
+    { value: "3", label: "Structured transcript" },
+    { value: "4", label: "Cleaned transcript" }
+  ];
+
   const monthOptions = useMemo(() => {
     if (yearFilter === "all") return [];
     const yearNumber = Number(yearFilter);
@@ -148,9 +157,11 @@ function TalksList({ onSelect, initialTalks, loading, error }: TalksListProps) {
         yearFilter === "all" || (parts && String(parts.year) === yearFilter);
       const matchesMonth =
         monthFilter === "all" || (parts && parts.month === Number(monthFilter));
-      return matchesTeacher && matchesSearch && matchesYear && matchesMonth;
+      const stageValue = talk.ts ?? 0;
+      const matchesStage = stageFilter === "all" || String(stageValue) === stageFilter;
+      return matchesTeacher && matchesSearch && matchesYear && matchesMonth && matchesStage;
     });
-  }, [talks, searchTerm, teacherFilter, yearFilter, monthFilter]);
+  }, [talks, searchTerm, teacherFilter, yearFilter, monthFilter, stageFilter]);
 
   const totalPages = Math.max(1, Math.ceil(filteredTalks.length / PAGE_SIZE));
   const currentPage = Math.min(page, totalPages);
@@ -233,6 +244,21 @@ function TalksList({ onSelect, initialTalks, loading, error }: TalksListProps) {
             {monthOptions.map((month) => (
               <option key={month} value={String(month)}>
                 {monthLabels[month - 1]}
+              </option>
+            ))}
+          </select>
+        </label>
+        <label className="filter">
+          <span className="filter__label">Transcript stage</span>
+          <select
+            className="input"
+            value={stageFilter}
+            onChange={(event) => setStageFilter(event.target.value)}
+          >
+            <option value="all">Any stage</option>
+            {stageOptions.map((stage) => (
+              <option key={stage.value} value={stage.value}>
+                {stage.label}
               </option>
             ))}
           </select>
