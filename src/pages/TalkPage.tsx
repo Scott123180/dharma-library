@@ -5,11 +5,19 @@ type TalkPageProps = {
   talkId: string;
   onNavigate?: (route: "home" | "roadmap" | "talk" | "about") => void;
   onPlay?: (talk: Talk) => void;
-  onInlinePlay?: (talk: Talk) => void;
+  onInlinePlay?: (talk: Talk, position: number) => void;
+  onInlinePause?: (talk: Talk, position: number) => void;
   onInlineProgress?: (seconds: number) => void;
 };
 
-function TalkPage({ talkId, onNavigate, onPlay, onInlinePlay, onInlineProgress }: TalkPageProps) {
+function TalkPage({
+  talkId,
+  onNavigate,
+  onPlay,
+  onInlinePlay,
+  onInlinePause,
+  onInlineProgress
+}: TalkPageProps) {
   return (
     <section className="talk-page">
       <div className="section__header">
@@ -31,6 +39,7 @@ function TalkPage({ talkId, onNavigate, onPlay, onInlinePlay, onInlineProgress }
         talkId={talkId}
         onPlay={onPlay}
         onInlinePlay={onInlinePlay}
+        onInlinePause={onInlinePause}
         onInlineProgress={onInlineProgress}
         inlineActive
       />

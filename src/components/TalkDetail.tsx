@@ -5,7 +5,8 @@ import { Talk } from "../types/talk";
 type TalkDetailProps = {
   talkId: string;
   onPlay?: (talk: Talk) => void;
-  onInlinePlay?: (talk: Talk) => void;
+  onInlinePlay?: (talk: Talk, position: number) => void;
+  onInlinePause?: (talk: Talk, position: number) => void;
   onInlineProgress?: (seconds: number) => void;
   inlineActive?: boolean;
   inlinePosition?: number;
@@ -16,6 +17,7 @@ function TalkDetail({
   talkId,
   onPlay,
   onInlinePlay,
+  onInlinePause,
   onInlineProgress,
   inlineActive,
   inlinePosition = 0,
@@ -199,7 +201,14 @@ function TalkDetail({
                         <div className="lineage__dot" aria-hidden="true" />
                         <div className="lineage__label">{step.label}</div>
                         {index < lineageSteps.length - 1 ? (
-                          <div className="lineage__track" aria-hidden="true" />
+                          <div
+                            className={`lineage__track${
+                              step.complete && lineageSteps[index + 1]?.complete
+                                ? " is-complete"
+                                : ""
+                            }`}
+                            aria-hidden="true"
+                          />
                         ) : null}
                       </div>
                     ))}
@@ -231,7 +240,12 @@ function TalkDetail({
                 controls
                 className="audio-player"
                 src={talk.audioUrl}
-                onPlay={() => onInlinePlay?.(talk)}
+                onPlay={() =>
+                  onInlinePlay?.(talk, audioRef.current ? audioRef.current.currentTime : 0)
+                }
+                onPause={() =>
+                  onInlinePause?.(talk, audioRef.current ? audioRef.current.currentTime : 0)
+                }
                 onLoadedMetadata={() => {
                   if (inlinePosition > 0 && audioRef.current) {
                     audioRef.current.currentTime = inlinePosition;

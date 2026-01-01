@@ -2,7 +2,7 @@
   "audioUrl": "https://media-archive.zmmapple.com/pages/download.php?direct=1&ref=37675&ext=mp3",
   "caption": "",
   "catalogId": "AR47",
-  "dataLineage": ["unprocessed"],
+  "dataLineage": ["audio_original", "transcript_raw"],
   "date": "2024-07-07 12:59",
   "duration": "0:44:46",
   "id": "37675",
@@ -15,5 +15,5 @@
   "title": "We The People",
   "track": "",
   "trainingQuarter": "2024 Summer",
-  "transcript": ""
+  "transcript": "This is a test transcript"
 }

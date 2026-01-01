@@ -4,7 +4,8 @@ import { Talk } from "../types/talk";
 type FeaturedTalkProps = {
   talk: Talk;
   onPlay?: (talk: Talk) => void;
-  onInlinePlay?: (talk: Talk) => void;
+  onInlinePlay?: (talk: Talk, position: number) => void;
+  onInlinePause?: (talk: Talk, position: number) => void;
   onInlineProgress?: (seconds: number) => void;
   inlineActive?: boolean;
   inlinePosition?: number;
@@ -15,6 +16,7 @@ function FeaturedTalk({
   talk,
   onPlay,
   onInlinePlay,
+  onInlinePause,
   onInlineProgress,
   inlineActive,
   inlinePosition = 0,
@@ -64,7 +66,12 @@ function FeaturedTalk({
               controls
               className="audio-player"
               src={talk.audioUrl}
-              onPlay={() => onInlinePlay?.(talk)}
+              onPlay={() =>
+                onInlinePlay?.(talk, audioRef.current ? audioRef.current.currentTime : 0)
+              }
+              onPause={() =>
+                onInlinePause?.(talk, audioRef.current ? audioRef.current.currentTime : 0)
+              }
               onLoadedMetadata={() => {
                 if (inlinePosition > 0 && audioRef.current) {
                   audioRef.current.currentTime = inlinePosition;

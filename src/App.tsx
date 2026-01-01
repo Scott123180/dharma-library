@@ -78,8 +78,17 @@ function App() {
 
   const [selectedTalkId, setSelectedTalkId] = useState<string | null>(initialTalkId);
 
-  const [nowPlaying, setNowPlaying] = useState<{ talk: Talk; position: number } | null>(null);
-  const [inlinePlaying, setInlinePlaying] = useState<{ talk: Talk; route: Route; position: number } | null>(null);
+  const [nowPlaying, setNowPlaying] = useState<{
+    talk: Talk;
+    position: number;
+    shouldPlay: boolean;
+  } | null>(null);
+  const [inlinePlaying, setInlinePlaying] = useState<{
+    talk: Talk;
+    route: Route;
+    position: number;
+    isPlaying: boolean;
+  } | null>(null);
 
   useEffect(() => {
     document.documentElement.setAttribute("data-theme", theme);
@@ -115,7 +124,11 @@ function App() {
 
   useEffect(() => {
     if (inlinePlaying && inlinePlaying.route !== route && !nowPlaying) {
-      setNowPlaying({ talk: inlinePlaying.talk, position: inlinePlaying.position });
+      setNowPlaying({
+        talk: inlinePlaying.talk,
+        position: inlinePlaying.position,
+        shouldPlay: inlinePlaying.isPlaying
+      });
       setInlinePlaying(null);
     }
   }, [route, inlinePlaying, nowPlaying]);
@@ -197,12 +210,16 @@ function App() {
 
   const handlePlay = (talk: Talk) => {
     const startAt = inlinePlaying && inlinePlaying.talk.id === talk.id ? inlinePlaying.position : 0;
-    setNowPlaying({ talk, position: startAt });
+    setNowPlaying({ talk, position: startAt, shouldPlay: true });
     setInlinePlaying(null);
   };
 
-  const handleInlinePlay = (talk: Talk) => {
-    setInlinePlaying({ talk, route, position: 0 });
+  const handleInlinePlay = (talk: Talk, position: number) => {
+    setInlinePlaying({ talk, route, position, isPlaying: true });
+  };
+
+  const handleInlinePause = (talk: Talk, position: number) => {
+    setInlinePlaying({ talk, route, position, isPlaying: false });
   };
 
   const handleInlineProgress = (seconds: number) => {
@@ -267,6 +284,7 @@ function App() {
                   talk={featuredTalk}
                   onPlay={handlePlay}
                   onInlinePlay={handleInlinePlay}
+                  onInlinePause={handleInlinePause}
                   onInlineProgress={handleInlineProgress}
                   inlineActive={activeInlineTalkId === featuredTalk.id}
                   inlinePosition={activeInlineTalkId === featuredTalk.id ? inlinePlaying?.position ?? 0 : 0}
@@ -344,6 +362,7 @@ function App() {
                 talkId={selectedTalkId}
                 onPlay={handlePlay}
                 onInlinePlay={handleInlinePlay}
+                onInlinePause={handleInlinePause}
                 onInlineProgress={handleInlineProgress}
                 inlineActive={activeInlineTalkId === selectedTalkId}
                 inlinePosition={activeInlineTalkId === selectedTalkId ? inlinePlaying?.position ?? 0 : 0}
@@ -364,6 +383,7 @@ function App() {
       <PlayerBar
         talk={nowPlaying?.talk ?? null}
         startAt={nowPlaying?.position ?? 0}
+        autoPlay={nowPlaying?.shouldPlay ?? true}
         onClose={() => setNowPlaying(null)}
         onProgress={handleGlobalProgress}
       />

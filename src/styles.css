@@ -998,7 +998,7 @@ a {
   border-color: transparent;
 }
 
-.lineage__step.is-complete .lineage__track {
+.lineage__track.is-complete {
   background: linear-gradient(90deg, var(--accent), var(--accent-strong));
 }
 

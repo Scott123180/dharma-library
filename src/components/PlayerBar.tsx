@@ -4,11 +4,12 @@ import { Talk } from "../types/talk";
 type PlayerBarProps = {
   talk: Talk | null;
   startAt?: number;
+  autoPlay?: boolean;
   onClose: () => void;
   onProgress?: (seconds: number) => void;
 };
 
-function PlayerBar({ talk, startAt = 0, onClose, onProgress }: PlayerBarProps) {
+function PlayerBar({ talk, startAt = 0, autoPlay = true, onClose, onProgress }: PlayerBarProps) {
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const startPositionRef = useRef(0);
   const currentSourceRef = useRef<string | null>(null);
@@ -24,24 +25,26 @@ function PlayerBar({ talk, startAt = 0, onClose, onProgress }: PlayerBarProps) {
     }
 
     const audio = audioRef.current;
-    const setStartAndPlay = () => {
+    const setStartAndMaybePlay = () => {
       if (startPositionRef.current > 0) {
         audio.currentTime = startPositionRef.current;
         startPositionRef.current = 0;
       }
-      audio
-        .play()
-        .catch(() => {
-          /* ignore autoplay block */
-        });
+      if (autoPlay) {
+        audio
+          .play()
+          .catch(() => {
+            /* ignore autoplay block */
+          });
+      }
     };
 
     if (audio.readyState >= 1) {
-      setStartAndPlay();
+      setStartAndMaybePlay();
     } else {
-      audio.addEventListener("loadedmetadata", setStartAndPlay, { once: true });
+      audio.addEventListener("loadedmetadata", setStartAndMaybePlay, { once: true });
     }
-  }, [talk?.audioUrl]);
+  }, [talk?.audioUrl, autoPlay]);
 
   const handleTimeUpdate = () => {
     if (audioRef.current) {
