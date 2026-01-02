@@ -79,17 +79,25 @@ function TalkDetail({
   const caption = talk.caption?.trim();
   const summary = talk.summary?.trim();
   const koanCollection = talk.koanCollection || talk.collection;
-  const lineageOrder = ["audio_original", "transcript_raw", "transcript_structured"];
-  const lineageLabels: Record<string, string> = {
-    audio_original: "Audio original",
-    transcript_raw: "Transcript raw",
-    transcript_structured: "Transcript structured"
+  const lineageStages = [
+    { key: "audio_only", value: 1, label: "Audio only" },
+    { key: "raw_transcript", value: 2, label: "Raw transcript" },
+    { key: "structured_transcript", value: 3, label: "Structured transcript" },
+    { key: "cleaned_transcript", value: 4, label: "Cleaned transcript" }
+  ];
+  const lineageValueMap: Record<string, number> = {
+    audio_original: 1,
+    transcript_raw: 2,
+    transcript_structured: 3,
+    transcript_cleaned: 4
   };
-  const lineageSet = new Set(talk.dataLineage || []);
-  const lineageSteps = lineageOrder.map((key) => ({
-    key,
-    label: lineageLabels[key] || key,
-    complete: lineageSet.has(key)
+  const lineageValue = (talk.dataLineage || []).reduce((max, entry) => {
+    return Math.max(max, lineageValueMap[entry] || 0);
+  }, 0);
+  const lineageSteps = lineageStages.map((stage) => ({
+    key: stage.key,
+    label: stage.label,
+    complete: lineageValue >= stage.value
   }));
   const splitIntoSentences = (text: string) => {
     const matches = text.match(/[^.!?]+[.!?]+|[^.!?]+$/g);
@@ -187,7 +195,7 @@ function TalkDetail({
                 <dd>{talk.trainingQuarter}</dd>
               </>
             ) : null}
-            {talk.dataLineage?.length ? (
+            {lineageValue ? (
               <>
                 <dt>Data lineage</dt>
                 <dd>

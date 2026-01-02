@@ -126,7 +126,6 @@ function TalksList({ onSelect, initialTalks, loading, error }: TalksListProps) {
   ];
 
   const stageOptions = [
-    { value: "0", label: "Unknown or unprocessed" },
     { value: "1", label: "Audio only" },
     { value: "2", label: "Raw transcript" },
     { value: "3", label: "Structured transcript" },
@@ -157,7 +156,7 @@ function TalksList({ onSelect, initialTalks, loading, error }: TalksListProps) {
         yearFilter === "all" || (parts && String(parts.year) === yearFilter);
       const matchesMonth =
         monthFilter === "all" || (parts && parts.month === Number(monthFilter));
-      const stageValue = talk.ts ?? 0;
+      const stageValue = talk.ts ?? 1;
       const matchesStage = stageFilter === "all" || String(stageValue) === stageFilter;
       return matchesTeacher && matchesSearch && matchesYear && matchesMonth && matchesStage;
     });
