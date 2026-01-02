@@ -74,6 +74,8 @@ function TalkDetail({
     return null;
   }
 
+  // TODO: remove the reference to talk here - the index is generated from the
+  //  talk card, and so having it here is not necessary.
   const speaker = talk.speaker || talk.teacher || "Unknown speaker";
   const durationLabel = talk.duration?.trim();
   const caption = talk.caption?.trim();

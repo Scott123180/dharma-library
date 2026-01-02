@@ -1110,3 +1110,36 @@ a {
     align-items: flex-start;
   }
 }
+
+@media (max-width: 640px) {
+  .page {
+    padding: 20px 14px 48px;
+  }
+
+  .talk-detail {
+    padding: 16px;
+    border-radius: 14px;
+  }
+
+  .talk-detail__card {
+    padding: 12px;
+    border-radius: 12px;
+  }
+
+  .talk-detail__card.transcript {
+    padding: 8px;
+  }
+
+  .transcript__body {
+    padding: 0;
+    max-width: 100%;
+    margin-left: 0;
+    margin-right: 0;
+  }
+
+  .talk-detail__summary-text {
+    max-width: 100%;
+    margin-left: 0;
+    margin-right: 0;
+  }
+}
