@@ -198,7 +198,7 @@ function TalkDetail({
             {lineageValue ? (
               <>
                 <dt>Data lineage</dt>
-                <dd>
+                <dd className="meta-grid__full">
                   <div className="lineage" role="list">
                     {lineageSteps.map((step, index) => (
                       <div
