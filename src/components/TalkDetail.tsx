@@ -81,6 +81,7 @@ function TalkDetail({
   const durationLabel = talk.duration?.trim();
   const caption = talk.caption?.trim();
   const summary = talk.summary?.trim();
+  const hasTranscript = Boolean(talk.transcript?.trim());
   const koanCollection = talk.koanCollection || talk.collection;
   const lineageStages = [
     { key: "audio_only", value: 1, label: "Audio only" },
@@ -165,9 +166,20 @@ function TalkDetail({
   const metaBits = [speaker, talk.location?.trim(), talk.date?.trim(), durationLabel]
     .filter(Boolean)
     .join(" · ");
+  const handlePrint = () => {
+    if (typeof window !== "undefined") {
+      window.print();
+    }
+  };
 
   return (
     <article className="talk-detail">
+      <div className="print-header print-only">
+        <p className="print-header__site">dharmalibrary.link</p>
+        <h1 className="print-header__title">{talk.title}</h1>
+        {metaBits ? <p className="print-header__meta">{metaBits}</p> : null}
+        {caption ? <p className="print-header__caption">{caption}</p> : null}
+      </div>
       <div className="talk-detail__header">
         <div>
           <p className="section__eyebrow">Talk</p>
@@ -178,8 +190,28 @@ function TalkDetail({
         <div className="talk-detail__pills">
           {talk.audioUrl ? <span className="pill">Audio</span> : null}
           <span className="pill pill--subtle">Transcript</span>
+          {hasTranscript ? (
+            <button className="btn btn-ghost btn-icon no-print" type="button" onClick={handlePrint}>
+              <span className="sr-only">Print transcript</span>
+              <svg
+                className="btn-icon__svg"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="1.8"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                aria-hidden="true"
+              >
+                <path d="M7 7V3h10v4" />
+                <path d="M5 8h14a2 2 0 0 1 2 2v6H3v-6a2 2 0 0 1 2-2z" />
+                <path d="M7 16h10v5H7z" />
+                <circle cx="17" cy="11" r="1" />
+              </svg>
+            </button>
+          ) : null}
           {onBack ? (
-            <button className="btn btn-ghost" onClick={onBack}>
+            <button className="btn btn-ghost no-print" onClick={onBack}>
               Back to list
             </button>
           ) : null}
@@ -300,7 +332,7 @@ function TalkDetail({
           </dl>
         </div>
 
-        <div className="talk-detail__card">
+        <div className="talk-detail__card talk-detail__card--audio no-print">
           <h3>Audio</h3>
           {talk.audioUrl ? (
             <div className="audio-player__container">

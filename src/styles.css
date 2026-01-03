@@ -243,6 +243,27 @@ a {
   background: rgba(255, 255, 255, 0.02);
 }
 
+.btn-icon {
+  padding: 10px;
+}
+
+.btn-icon__svg {
+  width: 18px;
+  height: 18px;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
 .filters {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
@@ -395,8 +416,11 @@ a {
   background: rgba(255, 255, 255, 0.08);
   border-radius: 999px;
   padding: 6px 10px;
+  display: inline-flex;
+  align-items: center;
   font-weight: 700;
   font-size: 0.82rem;
+  line-height: 1;
 }
 
 .pill--subtle {
@@ -896,6 +920,35 @@ a {
   gap: 8px;
 }
 
+.print-only {
+  display: none;
+}
+
+.print-header {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.print-header__site {
+  margin: 0;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  font-weight: 700;
+  font-size: 0.85rem;
+}
+
+.print-header__title {
+  margin: 0;
+  font-size: 1.75rem;
+}
+
+.print-header__meta,
+.print-header__caption {
+  margin: 0;
+  color: var(--muted);
+}
+
 .talk-detail__grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
@@ -1194,5 +1247,87 @@ a {
     max-width: 100%;
     margin-left: 0;
     margin-right: 0;
+  }
+}
+
+@media print {
+  :root {
+    color-scheme: light;
+  }
+
+  body {
+    background: #ffffff;
+    color: #111111;
+  }
+
+  .page {
+    max-width: none;
+    padding: 0;
+  }
+
+  .header,
+  .footer,
+  .player-bar,
+  .section__header,
+  .hero,
+  .cta,
+  .section.muted,
+  .no-print {
+    display: none !important;
+  }
+
+  .print-only {
+    display: block;
+  }
+
+  .talk-detail {
+    background: none;
+    border: none;
+    box-shadow: none;
+    padding: 0;
+  }
+
+  .talk-detail__header {
+    display: none;
+  }
+
+  .talk-detail__grid {
+    display: block;
+  }
+
+  .talk-detail__card {
+    background: none;
+    border: none;
+    padding: 0;
+    break-inside: avoid;
+  }
+
+  .talk-detail__card + .talk-detail__card {
+    margin-top: 18px;
+  }
+
+  .talk-detail__card--audio {
+    display: none;
+  }
+
+  .transcript__body,
+  .talk-detail__summary-text,
+  .print-header__meta,
+  .print-header__caption {
+    color: #111111;
+  }
+
+  .talk-detail {
+    padding-bottom: 0;
+  }
+
+  .transcript__body {
+    max-width: none;
+    margin: 0;
+  }
+
+  .talk-detail__summary-text {
+    max-width: none;
+    margin: 0;
   }
 }
