@@ -189,7 +189,7 @@ function TalkDetail({
         </div>
         <div className="talk-detail__pills">
           {talk.audioUrl ? <span className="pill">Audio</span> : null}
-          <span className="pill pill--subtle">Transcript</span>
+          {hasTranscript ? <span className="pill pill--subtle">Transcript</span> : null}
           {hasTranscript ? (
             <button className="btn btn-ghost btn-icon no-print" type="button" onClick={handlePrint}>
               <span className="sr-only">Print transcript</span>
