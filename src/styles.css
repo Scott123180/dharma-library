@@ -920,12 +920,7 @@ a {
   gap: 8px;
 }
 
-.print-only {
-  display: none;
-}
-
 .print-header {
-  display: flex;
   flex-direction: column;
   gap: 6px;
 }
@@ -947,6 +942,10 @@ a {
 .print-header__caption {
   margin: 0;
   color: var(--muted);
+}
+
+.print-only {
+  display: none;
 }
 
 .talk-detail__grid {
@@ -1278,6 +1277,10 @@ a {
 
   .print-only {
     display: block;
+  }
+
+  .print-header {
+    display: flex;
   }
 
   .talk-detail {
