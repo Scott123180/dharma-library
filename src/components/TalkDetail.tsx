@@ -26,6 +26,7 @@ function TalkDetail({
   const [talk, setTalk] = useState<Talk | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [lineageExpanded, setLineageExpanded] = useState(false);
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
   useEffect(() => {
@@ -93,9 +94,31 @@ function TalkDetail({
     transcript_structured: 3,
     transcript_cleaned: 4
   };
-  const lineageValue = (talk.dataLineage || []).reduce((max, entry) => {
-    return Math.max(max, lineageValueMap[entry] || 0);
+  const lineageEntries = talk.dataLineage || [];
+  const lineageValue = lineageEntries.reduce((max, entry) => {
+    const stageKey = typeof entry === "string" ? entry : entry.stage;
+    return Math.max(max, lineageValueMap[stageKey] || 0);
   }, 0);
+  const structuredLikeness = lineageEntries.reduce<number | null>((value, entry) => {
+    if (
+      typeof entry === "object" &&
+      entry.stage === "transcript_structured" &&
+      typeof entry.likeness === "number"
+    ) {
+      return entry.likeness;
+    }
+    return value;
+  }, null);
+  const cleanedLikeness = lineageEntries.reduce<number | null>((value, entry) => {
+    if (
+      typeof entry === "object" &&
+      entry.stage === "transcript_cleaned" &&
+      typeof entry.likeness === "number"
+    ) {
+      return entry.likeness;
+    }
+    return value;
+  }, null);
   const lineageSteps = lineageStages.map((stage) => ({
     key: stage.key,
     label: stage.label,
@@ -223,6 +246,42 @@ function TalkDetail({
                       </div>
                     ))}
                   </div>
+                  {((structuredLikeness !== null && lineageValue >= 3) ||
+                    (cleanedLikeness !== null && lineageValue >= 4)) ? (
+                    <div className="lineage__panel-wrap">
+                      <button
+                        type="button"
+                        className="lineage__toggle"
+                        onClick={() => setLineageExpanded((prev) => !prev)}
+                        aria-expanded={lineageExpanded}
+                      >
+                        {lineageExpanded ? "Hide lineage details" : "Show lineage details"}
+                      </button>
+                      {lineageExpanded ? (
+                        <div className="lineage__panel" role="group" aria-label="Lineage details">
+                          <div className="lineage__panel-row lineage__panel-heading">
+                            <span className="lineage__panel-label">Transcript similarity</span>
+                          </div>
+                          {structuredLikeness !== null && lineageValue >= 3 ? (
+                            <div className="lineage__panel-row">
+                              <span className="lineage__panel-label">Raw → structured</span>
+                              <span className="lineage__panel-value">
+                                {(structuredLikeness * 100).toFixed(1)}%
+                              </span>
+                            </div>
+                          ) : null}
+                          {cleanedLikeness !== null && lineageValue >= 4 ? (
+                            <div className="lineage__panel-row">
+                              <span className="lineage__panel-label">Structured → cleaned</span>
+                              <span className="lineage__panel-value">
+                                {(cleanedLikeness * 100).toFixed(1)}%
+                              </span>
+                            </div>
+                          ) : null}
+                        </div>
+                      ) : null}
+                    </div>
+                  ) : null}
                 </dd>
               </>
             ) : null}

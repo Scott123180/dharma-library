@@ -2,7 +2,11 @@
   "audioUrl": "https://media-archive.zmmapple.com/pages/download.php?direct=1&ref=27044&ext=mp3",
   "caption": "",
   "catalogId": "618",
-  "dataLineage": ["audio_original", "transcript_raw", "transcript_structured"],
+  "dataLineage": [
+    "audio_original",
+    "transcript_raw",
+    { "likeness": 1.0, "stage": "transcript_structured" }
+  ],
   "date": "1989-10-21 17:23",
   "duration": "0:10:06",
   "id": "27044",

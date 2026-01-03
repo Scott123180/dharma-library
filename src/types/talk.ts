@@ -1,3 +1,10 @@
+export type DataLineageEntry =
+  | string
+  | {
+      stage: string;
+      likeness?: number;
+    };
+
 export interface TalkMetadata {
   id: string; // e.g. "37675" or "2024-03-15-dana-paramita"
   title: string;
@@ -14,7 +21,7 @@ export interface TalkMetadata {
   koanCase?: string;
   catalogId?: string;
   trainingQuarter?: string;
-  dataLineage?: string[];
+  dataLineage?: DataLineageEntry[];
   ts?: number;
   retreat?: string;
   contributedBy?: string;

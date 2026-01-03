@@ -1012,6 +1012,59 @@ a {
   background: linear-gradient(90deg, var(--accent), var(--accent-strong));
 }
 
+.lineage__panel-wrap {
+  margin-top: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.lineage__toggle {
+  align-self: flex-start;
+  background: none;
+  border: 0;
+  padding: 0;
+  color: var(--accent);
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.lineage__toggle:hover,
+.lineage__toggle:focus-visible {
+  color: var(--accent-strong);
+}
+
+.lineage__panel {
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 8px 10px;
+  background: rgba(255, 255, 255, 0.03);
+  display: grid;
+  gap: 6px;
+}
+
+.lineage__panel-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  font-size: 0.85rem;
+  color: var(--text);
+}
+
+.lineage__panel-heading {
+  font-weight: 600;
+}
+
+.lineage__panel-label {
+  color: var(--muted);
+}
+
+.lineage__panel-value {
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+}
+
 .talk-detail__tags {
   display: flex;
   flex-wrap: wrap;
