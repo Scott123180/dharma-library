@@ -12,3 +12,5 @@ const normalizeTalkId = (id: string) => id.replace(/^\/+|\/+$/g, "");
 
 export const talkUrl = (id: string) =>
   `${TALKS_BASE_URL}/talks/${normalizeTalkId(id)}.json`;
+
+export const TRANSCRIPT_READING_WPM = 180;

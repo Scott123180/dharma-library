@@ -31,6 +31,7 @@ function FeaturedTalk({
     .join(" · ");
   const caption = talk.caption?.trim();
   const summary = talk.summary?.trim();
+  const hasTranscript = Boolean(talk.transcript?.trim());
 
   useEffect(() => {
     if (!inlineActive && audioRef.current) {
@@ -50,7 +51,7 @@ function FeaturedTalk({
         </div>
         <div className="featured-talk__actions">
           {talk.audioUrl ? <span className="pill">Audio</span> : null}
-          <span className="pill pill--subtle">Transcript</span>
+          {hasTranscript ? <span className="pill pill--subtle">Transcript</span> : null}
           <button className="btn btn-primary" onClick={() => onViewTalk?.(talk)}>
             Go to talk page
           </button>

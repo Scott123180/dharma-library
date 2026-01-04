@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { fetchTalk } from "../api/talks";
+import { TRANSCRIPT_READING_WPM } from "../config/talks";
 import { Talk } from "../types/talk";
 
 type TalkDetailProps = {
@@ -132,6 +133,17 @@ function TalkDetail({
       .filter(Boolean);
   };
 
+  const normalizedTranscript = talk.transcript
+    .replace(/\\n/g, "\n") // handle escaped newlines that arrived as literal backslash-n
+    .replace(/\r\n/g, "\n");
+  const transcriptWordCount = normalizedTranscript.trim()
+    ? normalizedTranscript.trim().split(/\s+/).length
+    : 0;
+  const readingMinutes = transcriptWordCount
+    ? Math.ceil(transcriptWordCount / TRANSCRIPT_READING_WPM)
+    : null;
+  const readingTimeLabel = readingMinutes ? `${readingMinutes} minute read` : null;
+
   const chunkSentences = (sentences: string[], size: number) => {
     const chunks: string[] = [];
     for (let i = 0; i < sentences.length; i += size) {
@@ -141,10 +153,7 @@ function TalkDetail({
   };
 
   const transcriptParagraphs = (() => {
-    const normalized = talk.transcript
-      .replace(/\\n/g, "\n") // handle escaped newlines that arrived as literal backslash-n
-      .replace(/\r\n/g, "\n");
-    const paragraphs = normalized
+    const paragraphs = normalizedTranscript
       .split(/\n+/) // treat single or multiple newlines as paragraph separators
       .map((paragraph) => paragraph.trim())
       .filter(Boolean);
@@ -251,6 +260,12 @@ function TalkDetail({
               <>
                 <dt>Training quarter</dt>
                 <dd>{talk.trainingQuarter}</dd>
+              </>
+            ) : null}
+            {readingTimeLabel ? (
+              <>
+                <dt>Reading time</dt>
+                <dd>{readingTimeLabel}</dd>
               </>
             ) : null}
             {lineageValue ? (

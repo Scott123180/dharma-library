@@ -21,8 +21,17 @@ function Footer({ onNavigate }: FooterProps) {
         >
           About
         </a>
-        <a href="#roadmap">Roadmap</a>
-        <a href="#talks">Talks</a>
+        <a
+          href="/roadmap"
+          onClick={(e) => {
+            if (onNavigate) {
+              e.preventDefault();
+              onNavigate("roadmap");
+            }
+          }}
+        >
+          Roadmap
+        </a>
         <a href="https://github.com/Scott123180/dharma-library" target="_blank" rel="noreferrer">
           GitHub
         </a>
