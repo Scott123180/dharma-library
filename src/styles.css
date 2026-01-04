@@ -271,6 +271,12 @@ a {
   margin-bottom: 12px;
 }
 
+.results-count {
+  margin: 0 0 18px;
+  font-weight: 700;
+  color: var(--muted);
+}
+
 .filter {
   display: flex;
   flex-direction: column;

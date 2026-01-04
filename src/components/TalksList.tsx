@@ -168,6 +168,7 @@ function TalksList({ onSelect, initialTalks, loading, error }: TalksListProps) {
   const visibleTalks = filteredTalks.slice(startIndex, startIndex + PAGE_SIZE);
   const startLabel = startIndex + 1;
   const endLabel = Math.min(startIndex + PAGE_SIZE, filteredTalks.length);
+  const resultsLabel = `${filteredTalks.length.toLocaleString()} of ${talks.length.toLocaleString()} talks`;
 
   const goToPage = (next: number) => {
     const clamped = Math.min(Math.max(1, next), totalPages);
@@ -263,6 +264,7 @@ function TalksList({ onSelect, initialTalks, loading, error }: TalksListProps) {
           </select>
         </label>
       </div>
+      <div className="results-count">Results: {resultsLabel}</div>
 
       {filteredTalks.length === 0 ? (
         <p>No talks match your filters yet.</p>

@@ -25,7 +25,10 @@ function FeaturedTalk({
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const speaker = talk.speaker || talk.teacher || "Unknown speaker";
   const durationLabel = talk.duration?.trim();
-  const metaBits = [speaker, talk.location?.trim(), talk.date?.trim(), durationLabel].filter(Boolean).join(" · ");
+  const dateLabel = talk.date ? talk.date.trim().split(" ")[0] : undefined;
+  const metaBits = [speaker, talk.location?.trim(), dateLabel, durationLabel]
+    .filter(Boolean)
+    .join(" · ");
   const caption = talk.caption?.trim();
   const summary = talk.summary?.trim();
 

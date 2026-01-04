@@ -163,7 +163,8 @@ function TalkDetail({
     return paragraphs;
   })();
 
-  const metaBits = [speaker, talk.location?.trim(), talk.date?.trim(), durationLabel]
+  const dateLabel = talk.date ? talk.date.trim().split(" ")[0] : undefined;
+  const metaBits = [speaker, talk.location?.trim(), dateLabel, durationLabel]
     .filter(Boolean)
     .join(" · ");
   const handlePrint = () => {
@@ -364,10 +365,6 @@ function TalkDetail({
                 <button className="btn btn-primary" onClick={() => onPlay?.(talk)}>
                   Pop out mini player
                 </button>
-                <p className="talk-detail__note">
-                  Play inline or pop out. If you leave this page while playing inline, we&apos;ll move
-                  it to the mini player so it keeps going.
-                </p>
               </div>
             </div>
           ) : (
