@@ -21,6 +21,9 @@ function SearchResultCard({ result, onOpen, supportsTextFragments }: Props) {
   const teacher = metadata?.speaker ?? metadata?.teacher ?? "Unknown teacher";
   const duration = metadata?.duration ?? null;
   const overview = metadata?.summary ?? null;
+  const date = metadata?.date
+    ? new Date(metadata.date).toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" })
+    : null;
 
   const chunkPreview =
     chunk_text.length > CHUNK_PREVIEW_LENGTH
@@ -48,6 +51,9 @@ function SearchResultCard({ result, onOpen, supportsTextFragments }: Props) {
         <span className="search-result-card__teacher">{teacher}</span>
         {duration && (
           <span className="search-result-card__duration">{duration}</span>
+        )}
+        {date && (
+          <span className="search-result-card__date">{date}</span>
         )}
       </div>
 
