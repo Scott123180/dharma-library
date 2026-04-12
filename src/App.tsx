@@ -9,6 +9,7 @@ import TalkDetail from "./components/TalkDetail";
 import TalksList from "./components/TalksList";
 import AboutPage from "./pages/AboutPage";
 import RoadmapPage from "./pages/RoadmapPage";
+import SearchTalksPage from "./pages/SearchTalksPage";
 import { Talk, TalkMetadata } from "./types/talk";
 
 const features = [
@@ -44,7 +45,7 @@ const getInitialTheme = (): "light" | "dark" => {
   return prefersLight ? "light" : "dark";
 };
 
-type Route = "home" | "roadmap" | "talk" | "about";
+type Route = "home" | "roadmap" | "talk" | "about" | "search-talks";
 
 const parseLocation = (): { route: Route; talkId: string | null } => {
   if (typeof window === "undefined") {
@@ -60,6 +61,7 @@ const parseLocation = (): { route: Route; talkId: string | null } => {
   if (path === "/talk") return { route: "talk", talkId: null };
   if (path === "/roadmap") return { route: "roadmap", talkId: null };
   if (path === "/about") return { route: "about", talkId: null };
+  if (path === "/search-talks") return { route: "search-talks", talkId: null };
   return { route: "home", talkId: null };
 };
 
@@ -117,6 +119,8 @@ function App() {
           : "/talk"
         : route === "about"
         ? "/about"
+        : route === "search-talks"
+        ? "/search-talks"
         : "/";
     if (window.location.pathname !== path) {
       window.history.pushState({}, "", path);
@@ -376,6 +380,12 @@ function App() {
               <p>Select a talk on the home page to read.</p>
             )}
           </section>
+        ) : route === "search-talks" ? (
+          <SearchTalksPage
+            talksIndex={talksIndex}
+            indexLoading={indexLoading}
+            onSelectTalk={handleSelectTalk}
+          />
         ) : (
           <AboutPage />
         )}

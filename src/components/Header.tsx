@@ -5,14 +5,14 @@ import ThemeToggle from "./ThemeToggle";
 type HeaderProps = {
   theme: "light" | "dark";
   onToggleTheme: () => void;
-  route: "home" | "roadmap" | "talk" | "about";
-  onNavigate: (route: "home" | "roadmap" | "talk" | "about") => void;
+  route: "home" | "roadmap" | "talk" | "about" | "search-talks";
+  onNavigate: (route: "home" | "roadmap" | "talk" | "about" | "search-talks") => void;
 };
 
 function Header({ theme, onToggleTheme, route, onNavigate }: HeaderProps) {
   const handleNav = (
     evt: React.MouseEvent<HTMLAnchorElement>,
-    target: "home" | "roadmap" | "talk" | "about"
+    target: "home" | "roadmap" | "talk" | "about" | "search-talks"
   ) => {
     evt.preventDefault();
     onNavigate(target);
@@ -35,6 +35,13 @@ function Header({ theme, onToggleTheme, route, onNavigate }: HeaderProps) {
             onClick={(e) => handleNav(e, "home")}
           >
             Home
+          </a>
+          <a
+            href="/search-talks"
+            className={route === "search-talks" ? "is-active" : ""}
+            onClick={(e) => handleNav(e, "search-talks")}
+          >
+            Search
           </a>
           <a
             href="/roadmap"
