@@ -106,6 +106,7 @@ Client-side routing without a router library — uses `window.history.pushState(
 | `/talk/:id` | Individual talk detail |
 | `/about` | About/mission |
 | `/roadmap` | Development roadmap |
+| `/search-talks` | Semantic vector search across talk passages |
 
 ### Data Loading
 Two-tier model to minimize payload:
@@ -155,6 +156,12 @@ Tracked via the `dataLineage` array (string | `{ stage, likeness }` objects). Sh
 | [src/components/TalkDetail.tsx](src/components/TalkDetail.tsx) | Full talk view: transcript, audio, metadata, lineage |
 | [src/components/FeaturedTalk.tsx](src/components/FeaturedTalk.tsx) | Monthly rotating featured talk (deterministic via modulo) |
 | [src/components/PlayerBar.tsx](src/components/PlayerBar.tsx) | Global persistent audio player |
+| [src/pages/SearchTalksPage.tsx](src/pages/SearchTalksPage.tsx) | Search route container: query state, cache, API orchestration |
+| [src/components/search/](src/components/search/) | SearchBar, SearchResults, SearchResultCard, RelevanceIndicator |
+| [src/api/search.ts](src/api/search.ts) | `searchTalks()` — POST to semantic search API |
+| [src/types/search.ts](src/types/search.ts) | `SearchResult`, `EnrichedResult`, `RelevanceTier`, `SearchCacheEntry` |
+| [src/utils/searchCache.ts](src/utils/searchCache.ts) | sessionStorage cache with 7-day TTL |
+| [SEARCH_API_HANDOFF.md](SEARCH_API_HANDOFF.md) | Semantic search API integration reference |
 
 ---
 
