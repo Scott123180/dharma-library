@@ -133,7 +133,7 @@ function TalkDetail({
       .filter(Boolean);
   };
 
-  const normalizedTranscript = talk.transcript
+  const normalizedTranscript = (talk.transcript ?? "")
     .replace(/\\n/g, "\n") // handle escaped newlines that arrived as literal backslash-n
     .replace(/\r\n/g, "\n");
   const transcriptWordCount = normalizedTranscript.trim()

@@ -128,7 +128,7 @@ No environment variables are needed — config is driven by `import.meta.env.MOD
 ## External Dependencies
 
 - **CloudFront CDN** — serves talks index + individual talk JSON files (prod)
-- **Zen Mountain Monastery media archive** — audio file source (`media-archive.zmmapple.com`)
+- **Audio files** — hosted in `s3://dharma-library-bucket/audio/<id>.mp3`, served via CloudFront at `https://d2f7aw4s8anu7j.cloudfront.net/audio/<id>.mp3` (previously sourced directly from `media-archive.zmmapple.com`)
 - **Google Fonts** — Manrope, Fraunces
 - **AWS Amplify** — CI/CD and hosting
 
