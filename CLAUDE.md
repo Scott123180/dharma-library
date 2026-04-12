@@ -25,9 +25,73 @@ npm run dev        # Start dev server at http://localhost:5173
 npm run build      # Type check + Vite build → dist/
 npm run preview    # Preview production build locally
 npm run lint       # Type check only (tsc --noEmit)
+npm test           # Run Playwright end-to-end test suite (headless)
+npm run test:ui    # Run tests with the Playwright interactive UI
+npm run test:headed # Run tests in a visible browser window
 ```
 
-There are **no automated tests**. Testing is manual/UI-based.
+---
+
+## Testing
+
+### Overview
+
+End-to-end tests are written with [Playwright](https://playwright.dev/) and live in the `tests/` directory. The dev server (`npm run dev`) is started automatically by Playwright when running tests.
+
+**All network requests are intercepted** — tests never hit CloudFront or any external service. The shared fixture in [tests/fixtures.ts](tests/fixtures.ts) routes every `/dev-data/**` request to the local `public/dev-data/` files.
+
+### When to run tests
+
+Run the full suite after **any UI change**:
+
+```bash
+npm test
+```
+
+If you're actively developing, the interactive UI is more convenient:
+
+```bash
+npm run test:ui
+```
+
+### Test files
+
+| File | What it covers |
+|------|----------------|
+| [tests/fixtures.ts](tests/fixtures.ts) | Shared `test` fixture — network mocking, controlled 25-talk index |
+| [tests/home.spec.ts](tests/home.spec.ts) | Hero, featured talk, talks grid, feature cards, CTA |
+| [tests/navigation.spec.ts](tests/navigation.spec.ts) | Nav links, active state, deep links, back/forward, back button |
+| [tests/talks-list.spec.ts](tests/talks-list.spec.ts) | Search, teacher/year/month/stage filters, pagination, talk selection |
+| [tests/talk-detail.spec.ts](tests/talk-detail.spec.ts) | Metadata, transcript, audio player, data-lineage tracker |
+| [tests/theme.spec.ts](tests/theme.spec.ts) | Theme toggle, localStorage persistence, reload restoration |
+| [tests/player-bar.spec.ts](tests/player-bar.spec.ts) | Global player bar appearance, close button, navigation survival |
+
+### Writing tests for new features
+
+1. **Import `test` and `expect` from `./fixtures.js`** (not from `@playwright/test` directly) so every test gets the network mocks automatically.
+2. **Use `page.route()`** inside a test if you need to override the fixture for a specific scenario (see the lineage-panel test in `talk-detail.spec.ts` for an example).
+3. **Do not assert specific featured-talk titles.** The featured talk rotates monthly by algorithm; assert only that the section renders something (title is non-empty, pills are visible, etc.).
+4. **Add fixture data when testing new data shapes.** If a new field needs a fixture talk that has it, either add a fixture JSON file to `public/dev-data/talks/` or mock inline with `page.route()`.
+5. **Group tests with `test.describe()`** and use `test.beforeEach` for shared navigation setup within a group.
+
+### Fixture data reference
+
+The test fixture index has **25 talks** — enough to trigger pagination (PAGE_SIZE = 24).
+
+| Position | ID | Title | Has JSON file |
+|----------|----|-------|--------------|
+| 0 | 24525 | Hakuin's Song of zazen | ✓ |
+| 1 | 24526 | Perfection of Giving | ✓ |
+| 2 | 24769 | The Great Pearls Dana | ✓ |
+| 3 | 24780 | Spiritual Fidelity (no transcript) | ✓ |
+| 4 | 25342 | Stillness and Commotion | ✓ |
+| 5 | 27044 | daido's shinsanshiki tape 2 | ✓ |
+| 6 | 31782 | Disclosing Is Not As Good As Practice | ✓ |
+| 7 | 37675 | We The People | ✓ |
+| 8 | 37828 | Auspicious! Spring 2025 Ango Opening Talk | ✓ |
+| 9–24 | various | Metadata-only padding entries | — (falls back to 37675) |
+
+Any talk fetch for an ID without a fixture file is answered with a copy of talk 37675 (patched with the requested ID), so the app never 404s during tests.
 
 ---
 
