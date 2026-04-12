@@ -93,11 +93,12 @@ components under Principle IV (Interface Segregation / Single Responsibility).
 
 ## Complexity Tracking
 
-> No Constitution Check violations. Section intentionally left sparse.
+> One constitution note addressed below (Principle V — lazy loading).
 
-| Violation | Why Needed | Simpler Alternative Rejected Because |
-|-----------|------------|--------------------------------------|
-| Two new utility directories (`utils/`) | Cache, enrichment, relevance logic must not live in components | Would violate Principle III and IV if inlined |
+| Item | Decision | Rationale |
+|------|----------|-----------|
+| Two new utility directories (`utils/`) | Accepted | Cache, enrichment, relevance logic must not live in components — would violate Principles III and IV if inlined |
+| Lazy loading `SearchTalksPage` (Principle V MUST consider) | **Not lazy-loaded in v1** | `SearchTalksPage` is a non-critical-path route. `React.lazy()` would add an async boundary and a suspense fallback. Current bundle impact is one additional page-sized component; at the Dharma Library's traffic scale this is acceptable. Revisit if bundle analysis shows the route contributes >10 KB gzip to the initial chunk. Task T028 tracks this decision. |
 
 ---
 

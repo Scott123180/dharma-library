@@ -43,7 +43,7 @@ Must complete before any user story work begins.
 
 **⚠️ CRITICAL**: No user story work can begin until this phase is complete.
 
-- [ ] T003 [P] Create `src/api/search.ts` — implement `searchTalks(query: string, topK: number): Promise<SearchResult[]>` using the contract in `specs/001-search-talks/contracts/search-api.md`; handle 400, 401, 429, 503 with typed error throws; include `Content-Type: application/json` and `X-Api-Key: dharma-library-link` headers
+- [ ] T003 [P] Create `src/api/search.ts` — implement `searchTalks(query: string, topK = 10): Promise<SearchResult[]>` using the contract in `specs/001-search-talks/contracts/search-api.md`; `topK` defaults to 10 and callers MUST always pass 10 per FR-004 (parameter kept for explicitness but not varied); handle 400, 401, 429, 503 with typed error throws; include `Content-Type: application/json` and `X-Api-Key: dharma-library-link` headers
 - [ ] T004 [P] Create `src/utils/relevance.ts` — implement `getRelevanceTier(similarity: number): RelevanceTier` with thresholds from FR-007 (≥0.85 excellent, ≥0.70 strong, ≥0.55 good, <0.55 partial)
 - [ ] T005 [P] Create `src/utils/metadataMap.ts` — implement `buildMetadataMap(index: TalkMetadata[]): Map<string, TalkMetadata>` that maps each talk's `id` to its metadata entry
 - [ ] T006 [P] Create `src/utils/enrichResults.ts` — implement `enrichResults(raw: SearchResult[], map: Map<string, TalkMetadata>): EnrichedResult[]` that joins results with metadata; sets `metadata: null` for unmatched `talk_id` values
@@ -65,16 +65,16 @@ title, teacher name, and a relevance tier label.
 
 ### Tests for User Story 1 ⚠️ Write FIRST — confirm they FAIL before implementing
 
-- [ ] T009 [US1] Create `tests/search-talks.spec.ts` and write US1 Playwright tests: import `test` and `expect` from `./fixtures.js`; mock the search API POST endpoint via `page.route('**/search', ...)` returning a fixture of 3 results; cover: (1) page loads at `/search-talks` with search input focused and empty state visible, (2) valid query returns result cards with passage text + title + teacher + relevance label, (3) query < 3 chars shows inline validation and makes no API call, (4) query of exactly 150 chars is accepted, (5) submit button is disabled during loading, (6) zero-results state shown when API returns empty array, (7) error state shown when API returns 500 with retry button visible
+- [ ] T009 [US1] Create `tests/search-talks.spec.ts` and write US1 Playwright tests: import `test` and `expect` from `./fixtures.js`; mock the search API POST endpoint via `page.route('**/search', ...)` returning a fixture of 3 results; cover: (1) page loads at `/search-talks` with search input focused and empty state visible, (2) valid query returns result cards with passage text + title + teacher + relevance label, (3) query < 3 chars shows inline validation and makes no API call, (4) query of exactly 150 chars is accepted, (5) submit button is disabled during loading, (6) zero-results state shown when API returns empty array, (7) error state shown when API returns 500 with retry button visible, (8) **keyboard-only flow**: `page.keyboard.type(query)` → `page.keyboard.press('Enter')` → search input and button are disabled → results appear → `page.keyboard.press('Tab')` to first result card → `page.keyboard.press('Enter')` on "Open" button navigates to talk, (9) **accessibility assertions**: `expect(page.getByRole('button', { name: /Open/ }).first()).toBeVisible()`, verify relevance indicator has `aria-label` matching its tier label (e.g., `page.getByLabel('Excellent match')`), verify search input has an accessible label, verify "Show more" toggle is keyboard-reachable
 
 ### Implementation for User Story 1
 
 - [ ] T010 [P] [US1] Create `src/components/search/RelevanceIndicator.tsx` — renders 1–4 filled dots based on `tier: RelevanceTier` prop; includes `aria-label` equal to the tier label ("Excellent match" / "Strong match" / "Good match" / "Partial match"); does NOT use colour as the only indicator; uses CSS custom properties from `src/styles.css`
 - [ ] T011 [P] [US1] Create `src/components/search/SearchBar.tsx` — controlled input accepting `value`, `onChange`, `onSubmit`, `disabled` props; enforces 150-char max via `maxLength`; displays a live character count indicator; shows inline validation message when query < 3 chars on submit attempt; submit button and input are both disabled when `disabled` prop is true; search input has `aria-label`
-- [ ] T012 [US1] Create `src/components/search/SearchResultCard.tsx` — accepts `result: EnrichedResult` prop; renders matching passage (visually distinct block, truncated ~240 chars with "Show more" toggle); talk title (bold, 1 line ellipsis); teacher name; relevance indicator (via `RelevanceIndicator`); duration (omitted if null); overview truncated to ~160 chars (no expand); "Open [title]" button as primary action navigating to `/talk/<talk_id>`; graceful fallbacks per `data-model.md` when `metadata === null`; uses design tokens from `src/styles.css`
+- [ ] T012 [US1] Create `src/components/search/SearchResultCard.tsx` — accepts `result: EnrichedResult` prop; renders matching passage (visually distinct block, truncated ~240 chars with "Show more" toggle); talk title (bold, 1 line ellipsis); teacher name displayed using `metadata.speaker ?? metadata.teacher ?? 'Unknown teacher'` (prefer `speaker` as primary field; fall back to legacy `teacher`; then static fallback); relevance indicator (via `RelevanceIndicator`); duration (omitted if null); overview truncated to ~160 chars (no expand); "Open [title]" button as primary action navigating to `/talk/<talk_id>`; graceful fallbacks per `data-model.md` when `metadata === null`; uses design tokens from `src/styles.css`
 - [ ] T013 [US1] Create `src/components/search/SearchResults.tsx` — accepts `status: SearchStatus` and `results: EnrichedResult[]` props; renders appropriate state: idle (invitation prompt), loading (spinner), error (user-friendly message + Retry button that emits `onRetry` callback), zero-results (helpful message + suggestion to broaden query), success (list of `SearchResultCard` components in order received)
-- [ ] T014 [US1] Create `src/pages/SearchTalksPage.tsx` — route container accepting `talksIndex: TalkMetadata[]` prop; on mount builds metadata map via `buildMetadataMap`; owns `query`, `status`, and `results` state; calls `searchTalks()` and `enrichResults()` on submit; disables input during loading per FR-011; passes `onRetry` (fresh API call, bypasses cache) to `SearchResults`; renders `SearchBar` + `SearchResults`; keyboard focus goes to `SearchBar` on mount
-- [ ] T015 [US1] Update `src/App.tsx` — add render branch for `route === "search-talks"` rendering `<SearchTalksPage talksIndex={talksIndex} />`
+- [ ] T014 [US1] Create `src/pages/SearchTalksPage.tsx` — route container accepting `talksIndex: TalkMetadata[]` and `indexLoading: boolean` props; when `indexLoading` is true and a `?q=` param is present on mount, show a loading indicator and defer the auto-search until `indexLoading` becomes false (prevents enrichment running against an empty catalog); once `indexLoading` is false, build metadata map via `buildMetadataMap` and run any deferred auto-search; owns `query`, `status`, and `results` state; calls `searchTalks()` and `enrichResults()` on submit; disables input during loading per FR-011; passes `onRetry` (fresh API call, bypasses cache) to `SearchResults`; renders `SearchBar` + `SearchResults`; keyboard focus goes to `SearchBar` on mount
+- [ ] T015 [US1] Update `src/App.tsx` — add render branch for `route === "search-talks"` rendering `<SearchTalksPage talksIndex={talksIndex} indexLoading={indexLoading} />`
 - [ ] T016 [US1] Add CSS for search components to `src/styles.css` — style rules for `.search-bar`, `.search-results`, `.search-result-card`, `.relevance-indicator`, `.chunk-text` using existing CSS custom properties; card layout uses Flexbox; chunk text block uses `--surface` background for visual distinction; verify light and dark themes both render correctly
 
 **Checkpoint**: User Story 1 fully functional and independently testable. T009 tests should now pass.
@@ -132,9 +132,10 @@ Reload within 7 days — same results appear instantly from cache.
 
 - [ ] T023 [P] Verify light and dark themes in browser — start `npm run dev`, toggle theme, inspect all search components for correct `--bg`, `--surface`, `--accent`, `--text` token usage; fix any hardcoded colour values in `src/styles.css`
 - [ ] T024 [P] Run `npm run lint` — confirm zero TypeScript type errors (`tsc --noEmit`); fix any strict-mode violations introduced in new files
-- [ ] T025 Run `npm test` — confirm all tests pass: the original 90+ Playwright tests must not regress, and the new search tests in `tests/search-talks.spec.ts` must pass
+- [ ] T025 Run `npm test` — confirm all tests pass: the original 90+ Playwright tests must not regress, and the new search tests in `tests/search-talks.spec.ts` must pass; verify that accessibility assertions in T009 test cases (8) and (9) pass (keyboard flow and ARIA labels)
 - [ ] T026 [P] Complete manual validation steps 1–10 in `specs/001-search-talks/quickstart.md` — confirm each step's expected outcome is met in the browser
 - [ ] T027 [P] Update `WORKLOG.md` — record search feature completion, any decisions made during implementation that differ from the plan, and any open questions for future work
+- [ ] T028 [P] Document lazy-loading decision — confirm that `SearchTalksPage` is imported statically in `src/App.tsx` (not via `React.lazy()`); run `npm run build` and check the Vite bundle output to confirm the search page chunk is within acceptable size; if the search route's contribution exceeds 10 KB gzip in the initial bundle, convert to `React.lazy()` with a `<Suspense>` fallback per Constitution Principle V
 
 ---
 
@@ -159,7 +160,7 @@ Reload within 7 days — same results appear instantly from cache.
 All Phase 2 tasks T003–T006 can run in parallel (different files).
 T010 and T011 can run in parallel (different files).
 T018 can run while T017 tests are being written.
-T023, T024, T026, T027 can run in parallel in Phase 6.
+T023, T024, T026, T027, T028 can run in parallel in Phase 6.
 
 ---
 
@@ -216,3 +217,6 @@ Task: "Create SearchTalksPage.tsx"    # T014 (needs T011, T013)
 - `src/utils/searchCache.ts` is created in US3 phase because caching is specific to the shareability/bookmarking story
 - The Retry path in `SearchTalksPage` bypasses cache per FR-014 and clarification recorded in spec
 - "Open" button always uses neutral label "Open [title]" per clarification in spec
+- Teacher name field resolution in `SearchResultCard`: `metadata.speaker ?? metadata.teacher ?? 'Unknown teacher'`
+- `SearchTalksPage` accepts `indexLoading: boolean` to defer auto-search until catalog is ready
+- T028 satisfies Constitution Principle V (lazy loading MUST be considered); decision documented in plan.md Complexity Tracking
