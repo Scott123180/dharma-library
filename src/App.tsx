@@ -52,7 +52,8 @@ const parseLocation = (): { route: Route; talkId: string | null } => {
     return { route: "home", talkId: null };
   }
 
-  const path = window.location.pathname;
+  // Strip trailing slashes — Amplify adds them, which breaks exact-match routing.
+  const path = window.location.pathname.replace(/(.+)\/+$/, "$1");
   if (path.startsWith("/talk/")) {
     const rawId = decodeURIComponent(path.replace("/talk/", ""));
     const talkId = rawId.replace(/^\/+|\/+$/g, "") || null;
