@@ -18,7 +18,8 @@ export class SearchError extends Error {
 
 export async function searchTalks(
   query: string,
-  topK = 10
+  topK = 10,
+  filter?: Record<string, unknown>
 ): Promise<SearchResult[]> {
   let response: Response;
   try {
@@ -28,7 +29,7 @@ export async function searchTalks(
         "Content-Type": "application/json",
         "X-Api-Key": API_KEY,
       },
-      body: JSON.stringify({ query, top_k: topK }),
+      body: JSON.stringify({ query, top_k: topK, ...(filter ? { filter } : {}) }),
     });
   } catch {
     throw new SearchError("Unable to reach the search service. Check your connection.");

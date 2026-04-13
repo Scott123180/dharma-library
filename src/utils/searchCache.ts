@@ -2,17 +2,19 @@ import { EnrichedResult, SearchCacheEntry } from "../types/search";
 
 export const CACHE_TTL_MS = 7 * 24 * 60 * 60 * 1000; // 7 days
 
-function cacheKey(query: string): string {
-  return `dl_search_v1_${encodeURIComponent(query.trim())}`;
+function cacheKey(query: string, filter?: Record<string, unknown>): string {
+  const filterPart = filter ? encodeURIComponent(JSON.stringify(filter)) : "";
+  return `dl_search_v2_${encodeURIComponent(query.trim())}_${filterPart}`;
 }
 
-export function getCachedResults(query: string): EnrichedResult[] | null {
+export function getCachedResults(query: string, filter?: Record<string, unknown>): EnrichedResult[] | null {
   try {
-    const raw = sessionStorage.getItem(cacheKey(query));
+    const key = cacheKey(query, filter);
+    const raw = sessionStorage.getItem(key);
     if (!raw) return null;
     const entry = JSON.parse(raw) as SearchCacheEntry;
     if (Date.now() - entry.createdAt > CACHE_TTL_MS) {
-      sessionStorage.removeItem(cacheKey(query));
+      sessionStorage.removeItem(key);
       return null;
     }
     return entry.results;
@@ -21,10 +23,10 @@ export function getCachedResults(query: string): EnrichedResult[] | null {
   }
 }
 
-export function cacheResults(query: string, results: EnrichedResult[]): void {
+export function cacheResults(query: string, results: EnrichedResult[], filter?: Record<string, unknown>): void {
   try {
     const entry: SearchCacheEntry = { results, createdAt: Date.now() };
-    sessionStorage.setItem(cacheKey(query), JSON.stringify(entry));
+    sessionStorage.setItem(cacheKey(query, filter), JSON.stringify(entry));
   } catch {
     // sessionStorage unavailable — silently skip caching
   }

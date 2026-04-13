@@ -1,3 +1,4 @@
+import { Fragment } from "react";
 import { EnrichedResult } from "../../types/search";
 import { getRelevanceTier } from "../../utils/relevance";
 import RelevanceIndicator from "./RelevanceIndicator";
@@ -48,13 +49,14 @@ function SearchResultCard({ result, onOpen, supportsTextFragments }: Props) {
 
       <div className="search-result-card__meta">
         <span className="search-result-card__title">{title}</span>
-        <span className="search-result-card__teacher">{teacher}</span>
-        {duration && (
-          <span className="search-result-card__duration">{duration}</span>
-        )}
-        {date && (
-          <span className="search-result-card__date">{date}</span>
-        )}
+        <span className="search-result-card__byline">
+          {[teacher, duration, date].filter(Boolean).map((part, i) => (
+            <Fragment key={i}>
+              {i > 0 && <span className="search-result-card__pipe" aria-hidden="true">|</span>}
+              {part}
+            </Fragment>
+          ))}
+        </span>
       </div>
 
       {overviewPreview && (

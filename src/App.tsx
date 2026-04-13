@@ -122,7 +122,10 @@ function App() {
         : route === "search-talks"
         ? "/search-talks"
         : "/";
-    if (window.location.pathname !== path) {
+    // Normalize trailing slashes before comparing so Amplify's trailing-slash
+    // redirects don't push a phantom extra history entry.
+    const currentPath = window.location.pathname.replace(/(.+)\/+$/, "$1");
+    if (currentPath !== path) {
       window.history.pushState({}, "", path);
     }
   }, [route, selectedTalkId]);

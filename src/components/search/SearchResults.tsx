@@ -52,9 +52,9 @@ function SearchResults({ status, results, onOpen, onRetry, supportsTextFragments
 
   return (
     <div className="search-results">
-      {results.map((result) => (
+      {results.map((result, i) => (
         <SearchResultCard
-          key={`${result.searchResult.talk_id}-${result.searchResult.chunk_index}`}
+          key={`${result.searchResult.talk_id}-${i}`}
           result={result}
           onOpen={onOpen}
           supportsTextFragments={supportsTextFragments}
