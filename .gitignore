@@ -12,3 +12,6 @@ playwright-report/
 test-results/
 
 .claude/
+
+# Amplify Gen 2 local build cache
+.amplify/
