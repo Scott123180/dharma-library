@@ -28,6 +28,19 @@ Visit the printed local URL (defaults to `http://localhost:5173`). Build for pro
 3. Amplify will detect Vite and use `npm install`, `npm run build`, and `npm run preview` for verification.
 4. The build output lives in `dist/`. Configure the artifact directory to `dist`.
 
+## Authentication
+
+The site is gated behind Amazon Cognito authentication (Amplify Gen 2). Users must log in before accessing any content — there is no self-registration.
+
+**User Pool:** `us-east-1_GnKLpjgam`
+
+To add a user:
+1. Go to [AWS Cognito Console](https://console.aws.amazon.com/cognito) → User pools → `us-east-1_GnKLpjgam`
+2. Users tab → Create user
+3. Enter their email and a temporary password — they'll be prompted to set a permanent one on first login
+
+**Local development:** The Cognito resources were provisioned via `npx ampx sandbox` (requires Node 20, `@aws-amplify/backend-cli` installed globally). The generated `amplify_outputs.json` is committed and used by both dev and prod builds. To update auth config, edit [amplify/auth/resource.ts](amplify/auth/resource.ts) and re-run the sandbox.
+
 ## Roadmap hints
 
 - Add audio URLs and a player component when files are ready.
