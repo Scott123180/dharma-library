@@ -11,7 +11,13 @@ Amplify.configure(outputs);
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
-    <Authenticator hideSignUp={true}>
+    <Authenticator
+      hideSignUp={true}
+      passwordless={{
+        hiddenAuthMethods: ["PASSWORD"],
+        preferredAuthMethod: "EMAIL_OTP",
+      }}
+    >
       <App />
     </Authenticator>
   </React.StrictMode>
